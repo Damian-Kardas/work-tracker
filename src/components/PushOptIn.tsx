@@ -80,8 +80,8 @@ export default function PushOptIn() {
   if (status === "unsupported") {
     return (
       <p className="text-xs text-paper-500">
-        Ta przegladarka nie wspiera powiadomien push. Na iOS zainstaluj appke na ekran glowny
-        (Udostepnij -&gt; Dodaj do ekranu poczatkowego), zeby dzialaly.
+        Ta przeglądarka nie wspiera powiadomień push. Na iOS zainstaluj aplikację na ekran główny
+        (Udostępnij -&gt; Dodaj do ekranu początkowego), żeby działały.
       </p>
     );
   }
@@ -91,7 +91,7 @@ export default function PushOptIn() {
       <div>
         <p className="text-sm text-paper-100">Przypomnienia push</p>
         <p className="text-xs text-paper-500">
-          Powiadomienie o starcie i koncu pracy wg standardowych godzin.
+          Powiadomienie o starcie i końcu pracy wg standardowych godzin.
         </p>
       </div>
       {status === "on" ? (
@@ -99,7 +99,7 @@ export default function PushOptIn() {
           onClick={disable}
           className="shrink-0 rounded-card border border-ink-700 px-3 py-1.5 text-xs text-paper-300 hover:border-brick-500 hover:text-brick-400"
         >
-          Wylacz
+          Wyłącz
         </button>
       ) : (
         <button
@@ -107,7 +107,7 @@ export default function PushOptIn() {
           disabled={status === "loading"}
           className="shrink-0 rounded-card bg-amber-500 px-3 py-1.5 text-xs font-medium text-ink-950 hover:bg-amber-400 disabled:opacity-60"
         >
-          {status === "loading" ? "..." : status === "error" ? "Sprobuj ponownie" : "Wlacz"}
+          {status === "loading" ? "..." : status === "error" ? "Spróbuj ponownie" : "Włącz"}
         </button>
       )}
     </div>

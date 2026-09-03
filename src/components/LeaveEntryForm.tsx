@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { LeaveEntry, LeaveType } from "@/types/database";
+import { LEAVE_TYPE_LABELS } from "@/types/database";
 
 const LEAVE_TYPES: LeaveType[] = ["Wypoczynkowy", "Na zadanie", "Okolicznosciowy", "Inne"];
 
@@ -47,7 +48,7 @@ export default function LeaveEntryForm({
 
   async function handleSave() {
     if (!startDate || !endDate || endDate < startDate) {
-      setError("Sprawdz zakres dat.");
+      setError("Sprawdź zakres dat.");
       return;
     }
     setBusy(true);
@@ -84,7 +85,7 @@ export default function LeaveEntryForm({
 
   async function handleDelete() {
     if (!entry) return;
-    if (!confirm("Usunac ten wpis urlopu?")) return;
+    if (!confirm("Usunąć ten wpis urlopu?")) return;
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.from("leave_entries").delete().eq("id", entry.id);
@@ -101,28 +102,28 @@ export default function LeaveEntryForm({
 
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs text-paper-500">Od</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDatesChange(e.target.value, endDate)}
-                className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs text-paper-500">Do</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDatesChange(startDate, e.target.value)}
-                className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
               />
             </div>
           </div>
           <div>
             <label className="mb-1 block text-xs text-paper-500">
-              Liczba dni (wyliczona z dni roboczych, mozesz poprawic)
+              Liczba dni (wyliczona z dni roboczych, możesz poprawić)
             </label>
             <input
               type="number"
@@ -146,7 +147,7 @@ export default function LeaveEntryForm({
                       : "border-ink-700 text-paper-500"
                   }`}
                 >
-                  {t}
+                  {LEAVE_TYPE_LABELS[t]}
                 </button>
               ))}
             </div>
@@ -177,7 +178,7 @@ export default function LeaveEntryForm({
               disabled={busy}
               className="rounded-card border border-brick-500 px-3 py-2 text-sm text-brick-400"
             >
-              Usun
+              Usuń
             </button>
           )}
           <button

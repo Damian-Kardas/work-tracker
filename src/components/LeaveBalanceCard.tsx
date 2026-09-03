@@ -13,7 +13,7 @@ export default function LeaveBalanceCard({
       <div className="mb-3 flex items-end justify-between">
         <div>
           <p className="font-mono text-3xl font-semibold text-moss-400">{remaining}</p>
-          <p className="text-xs text-paper-500">dni pozostalo z {total}</p>
+          <p className="text-xs text-paper-500">dni pozostało z {total}</p>
         </div>
         <p className="text-sm text-paper-500">{used} wykorzystano</p>
       </div>

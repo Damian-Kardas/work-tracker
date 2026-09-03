@@ -76,7 +76,7 @@ export async function GET(request: Request) {
         .eq("entry_date", dateStr)
         .limit(1);
       if (!openToday || openToday.length === 0) {
-        message = { title: "Pora zaczac prace", body: "Nie zapomnij wlaczyc rejestracji czasu pracy." };
+        message = { title: "Pora zacząć pracę", body: "Nie zapomnij włączyć rejestracji czasu pracy." };
       }
     } else if (Math.abs(minutes - endMinutes) <= WINDOW_MINUTES) {
       const { data: openEntry } = await supabase
@@ -86,7 +86,7 @@ export async function GET(request: Request) {
         .is("end_time", null)
         .limit(1);
       if (openEntry && openEntry.length > 0) {
-        message = { title: "Koniec dnia pracy", body: "Nie zapomnij zakonczyc rejestracji czasu pracy." };
+        message = { title: "Koniec dnia pracy", body: "Nie zapomnij zakończyć rejestracji czasu pracy." };
       }
     }
 

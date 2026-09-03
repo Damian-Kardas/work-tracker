@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { LeaveEntry, Profile } from "@/types/database";
+import { LEAVE_TYPE_LABELS } from "@/types/database";
 import { formatDate } from "@/lib/utils/time";
 import { usedLeaveDays } from "@/lib/utils/leave";
 import LeaveBalanceCard from "@/components/LeaveBalanceCard";
@@ -59,7 +60,7 @@ export default function LeavePage() {
       {loading && <p className="text-sm text-paper-500">Wczytywanie...</p>}
       {!loading && entries.length === 0 && (
         <p className="text-sm text-paper-500">
-          Brak wpisow urlopowych. Dodaj urlop, ktory juz wykorzystales w tym roku, zeby saldo sie zgadzalo.
+          Brak wpisów urlopowych. Dodaj urlop, który już wykorzystałeś w tym roku, żeby saldo się zgadzało.
         </p>
       )}
 
@@ -75,7 +76,7 @@ export default function LeavePage() {
                 {formatDate(e.start_date)}
                 {e.end_date !== e.start_date && <> &ndash; {formatDate(e.end_date)}</>}
               </p>
-              <p className="mt-1 text-xs text-paper-500">{e.leave_type}</p>
+              <p className="mt-1 text-xs text-paper-500">{LEAVE_TYPE_LABELS[e.leave_type]}</p>
             </div>
             <span className="font-mono text-sm text-moss-400">{e.days_count} dni</span>
           </button>

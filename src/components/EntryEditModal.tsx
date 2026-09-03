@@ -40,14 +40,14 @@ export default function EntryEditModal({
     const supabase = createClient();
 
     if (!start) {
-      setError("Podaj godzine rozpoczecia.");
+      setError("Podaj godzinę rozpoczęcia.");
       setBusy(false);
       return;
     }
     const startIso = new Date(start).toISOString();
     const endIso = end ? new Date(end).toISOString() : null;
     if (endIso && new Date(endIso) <= new Date(startIso)) {
-      setError("Koniec musi byc pozniej niz poczatek.");
+      setError("Koniec musi być później niż początek.");
       setBusy(false);
       return;
     }
@@ -98,7 +98,7 @@ export default function EntryEditModal({
 
   async function handleDelete() {
     if (!entry) return;
-    if (!confirm("Usunac ten wpis?")) return;
+    if (!confirm("Usunąć ten wpis?")) return;
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.from("time_entries").delete().eq("id", entry.id);
@@ -114,7 +114,7 @@ export default function EntryEditModal({
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/60 sm:items-center">
       <div className="w-full max-w-sm rounded-t-card border border-ink-700 bg-ink-800 p-5 sm:rounded-card">
         <h2 className="mb-4 text-base font-semibold text-paper-100">
-          {entry ? "Edytuj wpis" : "Dodaj wpis recznie"}
+          {entry ? "Edytuj wpis" : "Dodaj wpis ręcznie"}
         </h2>
 
         <div className="space-y-3">
@@ -128,22 +128,22 @@ export default function EntryEditModal({
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs text-paper-500">Poczatek</label>
+            <div className="min-w-0">
+              <label className="mb-1 block text-xs text-paper-500">Początek</label>
               <input
                 type="datetime-local"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
-                className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs text-paper-500">Koniec</label>
               <input
                 type="datetime-local"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
-                className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function EntryEditModal({
               disabled={busy}
               className="rounded-card border border-brick-500 px-3 py-2 text-sm text-brick-400"
             >
-              Usun
+              Usuń
             </button>
           )}
           <button

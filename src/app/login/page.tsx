@@ -23,7 +23,7 @@ export default function LoginPage() {
     if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setError(error.message === "Invalid login credentials" ? "Bledny email lub haslo." : error.message);
+        setError(error.message === "Invalid login credentials" ? "Błędny email lub hasło." : error.message);
       } else {
         router.push("/");
         router.refresh();
@@ -36,7 +36,7 @@ export default function LoginPage() {
         router.push("/");
         router.refresh();
       } else {
-        setInfo("Konto utworzone. Sprawdz skrzynke email, aby potwierdzic rejestracje.");
+        setInfo("Konto utworzone. Sprawdź skrzynkę email, aby potwierdzić rejestrację.");
       }
     }
     setLoading(false);
@@ -47,7 +47,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <h1 className="mb-1 font-mono text-2xl font-semibold text-paper-100">Czas pracy</h1>
         <p className="mb-8 text-sm text-paper-500">
-          {mode === "signin" ? "Zaloguj sie do swojego konta." : "Zaloz nowe konto."}
+          {mode === "signin" ? "Zaloguj się do swojego konta." : "Załóż nowe konto."}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,7 +67,7 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="mb-1 block text-xs text-paper-500" htmlFor="password">
-              Haslo
+              Hasło
             </label>
             <input
               id="password"
@@ -89,7 +89,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-card bg-amber-500 py-2.5 font-medium text-ink-950 transition-colors hover:bg-amber-400 disabled:opacity-60"
           >
-            {loading ? "Chwileczke..." : mode === "signin" ? "Zaloguj sie" : "Zaloz konto"}
+            {loading ? "Chwileczkę..." : mode === "signin" ? "Zaloguj się" : "Załóż konto"}
           </button>
         </form>
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
           }}
           className="mt-5 w-full text-center text-sm text-paper-500 hover:text-paper-100"
         >
-          {mode === "signin" ? "Nie masz konta? Zaloz je" : "Masz juz konto? Zaloguj sie"}
+          {mode === "signin" ? "Nie masz konta? Załóż je" : "Masz już konto? Zaloguj się"}
         </button>
       </div>
     </div>

@@ -5,8 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const links = [
-  { href: "/", label: "Dzis" },
+  { href: "/", label: "Dziś" },
   { href: "/history", label: "Historia" },
+  { href: "/stats", label: "Statystyki" },
   { href: "/leave", label: "Urlop" },
   { href: "/settings", label: "Ustawienia" },
 ];
@@ -42,7 +43,7 @@ export default function NavBar() {
             <Link
               key={l.href}
               href={l.href}
-              className={`flex-1 rounded-card px-3 py-2 text-center text-sm transition-colors ${
+              className={`min-w-0 flex-1 rounded-card px-2 py-2 text-center text-xs transition-colors ${
                 active
                   ? "bg-ink-700 text-amber-400"
                   : "text-paper-500 hover:bg-ink-800 hover:text-paper-100"

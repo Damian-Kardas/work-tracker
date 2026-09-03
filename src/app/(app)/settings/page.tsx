@@ -8,7 +8,7 @@ import PushOptIn from "@/components/PushOptIn";
 const WEEKDAYS: { value: number; label: string }[] = [
   { value: 1, label: "Pon" },
   { value: 2, label: "Wt" },
-  { value: 3, label: "Sr" },
+  { value: 3, label: "Śr" },
   { value: 4, label: "Czw" },
   { value: 5, label: "Pt" },
   { value: 6, label: "Sob" },
@@ -68,7 +68,7 @@ export default function SettingsPage() {
   }
 
   if (loading) return <p className="text-sm text-paper-500">Wczytywanie...</p>;
-  if (!profile) return <p className="text-sm text-brick-400">Nie udalo sie wczytac profilu.</p>;
+  if (!profile) return <p className="text-sm text-brick-400">Nie udało się wczytać profilu.</p>;
 
   return (
     <div className="space-y-6">
@@ -81,7 +81,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-paper-500">Imie i nazwisko</label>
+          <label className="mb-1 block text-xs text-paper-500">Imię i nazwisko</label>
           <input
             type="text"
             value={profile.full_name ?? ""}
@@ -91,7 +91,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div className="min-w-0">
             <label className="mb-1 block text-xs text-paper-500">Standardowy start</label>
             <input
               type="time"
@@ -99,10 +99,10 @@ export default function SettingsPage() {
               onChange={(e) =>
                 setProfile({ ...profile, standard_start_time: `${e.target.value}:00` })
               }
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="mb-1 block text-xs text-paper-500">Standardowy koniec</label>
             <input
               type="time"
@@ -110,7 +110,7 @@ export default function SettingsPage() {
               onChange={(e) =>
                 setProfile({ ...profile, standard_end_time: `${e.target.value}:00` })
               }
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
             />
           </div>
         </div>

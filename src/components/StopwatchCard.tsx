@@ -44,7 +44,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
     setBusy(true);
     setLocationWarning(null);
     const pos = await getPosition();
-    if (!pos) setLocationWarning("Nie udalo sie pobrac lokalizacji - wpis zapisany bez GPS.");
+    if (!pos) setLocationWarning("Nie udało się pobrać lokalizacji – wpis zapisany bez GPS.");
 
     const supabase = createClient();
     const { data: userData } = await supabase.auth.getUser();
@@ -58,7 +58,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
       location_label: label,
     });
 
-    if (error) setLocationWarning(`Blad zapisu: ${error.message}`);
+    if (error) setLocationWarning(`Błąd zapisu: ${error.message}`);
     setBusy(false);
     router.refresh();
   }
@@ -68,7 +68,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
     setBusy(true);
     setLocationWarning(null);
     const pos = await getPosition();
-    if (!pos) setLocationWarning("Nie udalo sie pobrac lokalizacji konca - wpis zapisany bez GPS.");
+    if (!pos) setLocationWarning("Nie udało się pobrać lokalizacji końca – wpis zapisany bez GPS.");
 
     const supabase = createClient();
     const { error } = await supabase
@@ -80,7 +80,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
       })
       .eq("id", openEntry.id);
 
-    if (error) setLocationWarning(`Blad zapisu: ${error.message}`);
+    if (error) setLocationWarning(`Błąd zapisu: ${error.message}`);
     setBusy(false);
     router.refresh();
   }
@@ -102,7 +102,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
           disabled={busy}
           className="w-full rounded-card bg-brick-500 py-3 text-base font-medium text-paper-100 transition-colors hover:bg-brick-600 disabled:opacity-60"
         >
-          {busy ? "Zapisywanie..." : "Zakoncz prace"}
+          {busy ? "Zapisywanie..." : "Zakończ pracę"}
         </button>
         {locationWarning && <p className="mt-3 text-xs text-paper-500">{locationWarning}</p>}
       </div>
@@ -132,7 +132,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
         disabled={busy}
         className="w-full rounded-card bg-amber-500 py-3 text-base font-medium text-ink-950 transition-colors hover:bg-amber-400 disabled:opacity-60"
       >
-        {busy ? "Zapisywanie..." : "Rozpocznij prace"}
+        {busy ? "Zapisywanie..." : "Rozpocznij pracę"}
       </button>
       {locationWarning && <p className="mt-3 text-xs text-paper-500">{locationWarning}</p>}
     </div>

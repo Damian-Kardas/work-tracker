@@ -48,7 +48,7 @@ export default function HistoryPage() {
 
       {loading && <p className="text-sm text-paper-500">Wczytywanie...</p>}
       {!loading && entries.length === 0 && (
-        <p className="text-sm text-paper-500">Brak wpisow. Kliknij &quot;Dodaj wpis&quot;, zeby uzupelnic historie.</p>
+        <p className="text-sm text-paper-500">Brak wpisów. Kliknij &quot;Dodaj wpis&quot;, żeby uzupełnić historię.</p>
       )}
 
       {Object.entries(grouped).map(([date, dayEntries]) => (
