@@ -90,7 +90,7 @@ export default function SettingsPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="min-w-0">
             <label className="mb-1 block text-xs text-paper-500">Standardowy start</label>
             <input

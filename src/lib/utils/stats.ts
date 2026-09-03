@@ -40,3 +40,29 @@ export function countWorkDaysInRange(startStr: string, endStr: string, workDays:
   }
   return count;
 }
+
+/**
+ * Sumuje "rownowartosc" urlopu w sekundach dla danego zakresu dat: kazdy dzien urlopu, ktory
+ * wypada na dzien roboczy (wg ustawien profilu) i miesci sie w zakresie, liczy sie jako jeden
+ * standardowy dzien pracy. Pozwala to traktowac urlop jako "juz zaliczony" czas w tygodniu/miesiacu.
+ */
+export function leaveSecondsInRange(
+  entries: { start_date: string; end_date: string }[],
+  fromDate: string,
+  toDate: string,
+  workDays: number[],
+  dailySeconds: number
+): number {
+  let total = 0;
+  for (const entry of entries) {
+    const start = entry.start_date > fromDate ? entry.start_date : fromDate;
+    const end = entry.end_date < toDate ? entry.end_date : toDate;
+    if (start > end) continue;
+    let cur = start;
+    while (cur <= end) {
+      if (workDays.includes(isoWeekdayFromDateStr(cur))) total += dailySeconds;
+      cur = addDaysIso(cur, 1);
+    }
+  }
+  return total;
+}

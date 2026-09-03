@@ -4,10 +4,12 @@ export default function StatSummaryCard({
   title,
   worked,
   target,
+  leaveSeconds = 0,
 }: {
   title: string;
   worked: number;
   target: number;
+  leaveSeconds?: number;
 }) {
   const remaining = target - worked;
   const overtime = remaining < 0;
@@ -33,6 +35,11 @@ export default function StatSummaryCard({
           ? `Nadgodziny: ${formatDuration(Math.abs(remaining))}`
           : `Pozostało: ${formatDuration(remaining)}`}
       </p>
+      {leaveSeconds > 0 && (
+        <p className="mt-1 text-xs text-paper-500">
+          w tym urlop: {formatDuration(leaveSeconds)}
+        </p>
+      )}
     </div>
   );
 }

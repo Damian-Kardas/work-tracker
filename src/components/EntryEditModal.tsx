@@ -127,7 +127,7 @@ export default function EntryEditModal({
               className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
               <label className="mb-1 block text-xs text-paper-500">Początek</label>
               <input
