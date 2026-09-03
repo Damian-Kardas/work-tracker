@@ -102,7 +102,7 @@ export default function LeaveEntryForm({
 
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-x-auto">
               <label className="mb-1 block text-xs text-paper-500">Od</label>
               <input
                 type="date"
@@ -111,7 +111,7 @@ export default function LeaveEntryForm({
                 className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
               />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-x-auto">
               <label className="mb-1 block text-xs text-paper-500">Do</label>
               <input
                 type="date"

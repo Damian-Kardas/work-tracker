@@ -3,16 +3,15 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { LocationLabel, TimeEntry } from "@/types/database";
+import TimeSelect from "./TimeSelect";
 
 const LOCATION_OPTIONS: LocationLabel[] = ["Biuro", "Home office", "Targi / wyjazd", "Inne"];
 
-function toLocalInput(iso: string | null): string {
+function toLocalHHMM(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
-    d.getMinutes()
-  )}`;
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 export default function EntryEditModal({
@@ -22,13 +21,11 @@ export default function EntryEditModal({
   entry: TimeEntry | null; // null = tryb dodawania nowego wpisu
   onClose: (changed: boolean) => void;
 }) {
-  const [date, setDate] = useState(entry?.entry_date ?? new Date().toISOString().slice(0, 10));
-  const [start, setStart] = useState(
-    entry ? toLocalInput(entry.start_time) : `${new Date().toISOString().slice(0, 10)}T08:00`
-  );
-  const [end, setEnd] = useState(
-    entry ? toLocalInput(entry.end_time) : `${new Date().toISOString().slice(0, 10)}T16:00`
-  );
+  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(entry?.entry_date ?? today);
+  const [startTime, setStartTime] = useState(entry ? toLocalHHMM(entry.start_time) || "08:00" : "08:00");
+  const [endTime, setEndTime] = useState(entry ? toLocalHHMM(entry.end_time) || "16:00" : "16:00");
+  const [stillRunning, setStillRunning] = useState(!!entry && !entry.end_time);
   const [label, setLabel] = useState<LocationLabel>(entry?.location_label ?? "Biuro");
   const [notes, setNotes] = useState(entry?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -39,13 +36,9 @@ export default function EntryEditModal({
     setError(null);
     const supabase = createClient();
 
-    if (!start) {
-      setError("Podaj godzinę rozpoczęcia.");
-      setBusy(false);
-      return;
-    }
-    const startIso = new Date(start).toISOString();
-    const endIso = end ? new Date(end).toISOString() : null;
+    const startIso = new Date(`${date}T${startTime}:00`).toISOString();
+    const endIso = stillRunning ? null : new Date(`${date}T${endTime}:00`).toISOString();
+
     if (endIso && new Date(endIso) <= new Date(startIso)) {
       setError("Koniec musi być później niż początek.");
       setBusy(false);
@@ -118,33 +111,34 @@ export default function EntryEditModal({
         </h2>
 
         <div className="space-y-3">
-          <div>
+          <div className="min-w-0 overflow-x-auto">
             <label className="mb-1 block text-xs text-paper-500">Data</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
               <label className="mb-1 block text-xs text-paper-500">Początek</label>
-              <input
-                type="datetime-local"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
-              />
+              <TimeSelect value={startTime} onChange={setStartTime} />
             </div>
             <div className="min-w-0">
-              <label className="mb-1 block text-xs text-paper-500">Koniec</label>
-              <input
-                type="datetime-local"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
-              />
+              <div className="mb-1 flex items-center justify-between">
+                <label className="block text-xs text-paper-500">Koniec</label>
+                <label className="flex items-center gap-1.5 text-xs text-paper-500">
+                  <input
+                    type="checkbox"
+                    checked={stillRunning}
+                    onChange={(e) => setStillRunning(e.target.checked)}
+                    className="accent-amber-500"
+                  />
+                  nadal trwa
+                </label>
+              </div>
+              {!stillRunning && <TimeSelect value={endTime} onChange={setEndTime} />}
             </div>
           </div>
           <div>

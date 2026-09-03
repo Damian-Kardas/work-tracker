@@ -1,17 +1,19 @@
-export function formatClock(date: Date): string {
+export function formatClock(date: Date, timezone = "Europe/Warsaw"): string {
   return date.toLocaleTimeString("pl-PL", {
+    timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   });
 }
 
-export function formatHm(date: Date): string {
-  return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+export function formatHm(date: Date, timezone = "Europe/Warsaw"): string {
+  return date.toLocaleTimeString("pl-PL", { timeZone: timezone, hour: "2-digit", minute: "2-digit" });
 }
 
 export function formatDate(dateStr: string): string {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("pl-PL", {
+  return new Date(dateStr + "T00:00:00Z").toLocaleDateString("pl-PL", {
+    timeZone: "UTC",
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
