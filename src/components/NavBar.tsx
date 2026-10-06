@@ -46,6 +46,5 @@ export default function NavBar() {
             <Link
               key={l.href}
               href={l.href}
-              className={`flex-1 rounded-xl px-2 py-2 text-center text-sm transition ${
+              className={`flex-1 rounded-xl px-3 py-2 text-center text-sm transition ${
                 active
-        
