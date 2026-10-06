@@ -29,23 +29,10 @@ export default function ExportButtons({
       alert("Nie udało się wygenerować pliku Excel.");
     }
   }
-
-  async function handlePdfExport() {
-    try {
-      const { exportToPdf } = await import(
-        "@/lib/utils/exportPdf"
-      );
-
-      exportToPdf({
-        entries,
-        leaveEntries,
-        monthName,
-      });
-    } catch (error) {
-      console.error(error);
-      alert("Nie udało się wygenerować pliku PDF.");
-    }
-  }
+async function handlePdfExport() {
+  alert("PDF tymczasowo wyłączony.");
+}
+``
 
   return (
     <div className="grid grid-cols-2 gap-3">
