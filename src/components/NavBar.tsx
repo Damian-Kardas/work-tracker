@@ -48,4 +48,4 @@ export default function NavBar() {
               href={l.href}
               className={`flex-1 rounded-xl px-3 py-2 text-center text-sm transition ${
                 active
-                  ? "bg-blue-500 
+                  ? "bg-
