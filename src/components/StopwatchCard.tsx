@@ -87,11 +87,11 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
 
   if (openEntry) {
     return (
-      <div className="rounded-card border border-ink-700 bg-ink-800 p-6 text-center">
+      <div className="rounded-[20px] border border-gray-200 bg-white p-8 text-center shadow-sm">
         <p className="text-xs uppercase tracking-wide text-paper-500">
           Praca trwa od {formatHm(new Date(openEntry.start_time))}
         </p>
-        <p className="my-4 font-mono text-5xl font-semibold text-amber-400 tabular-nums">
+        <p className="my-6 text-6xl font-bold text-gray-900 tabular-nums">
           {formatDuration(elapsed, "stopwatch")}
         </p>
         <div className="mb-5 flex justify-center">
@@ -110,7 +110,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
   }
 
   return (
-    <div className="rounded-card border border-ink-700 bg-ink-800 p-6 text-center">
+    <div className="rounded-[20px] border border-gray-200 bg-white p-8 text-center shadow-sm">
       <p className="mb-4 text-xs uppercase tracking-wide text-paper-500">Gdzie dzisiaj pracujesz?</p>
       <div className="mb-6 grid grid-cols-2 gap-2">
         {LOCATION_OPTIONS.map((opt) => (
@@ -119,7 +119,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
             onClick={() => setLabel(opt)}
             className={`rounded-card border px-3 py-2 text-sm transition-colors ${
               label === opt
-                ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                ? "border-blue-500 bg-blue-50 text-blue-600"
                 : "border-ink-700 text-paper-500 hover:border-ink-600"
             }`}
           >
@@ -130,7 +130,7 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
       <button
         onClick={handleStart}
         disabled={busy}
-        className="w-full rounded-card bg-amber-500 py-3 text-base font-medium text-ink-950 transition-colors hover:bg-amber-400 disabled:opacity-60"
+        className="w-full rounded-xl bg-blue-500 py-4 text-base font-medium text-white transition hover:bg-blue-600 disabled:opacity-60"
       >
         {busy ? "Zapisywanie..." : "Rozpocznij pracę"}
       </button>
