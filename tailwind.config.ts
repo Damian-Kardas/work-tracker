@@ -1,35 +1,37 @@
-colors: {
-  canvas: "#ffffff",
+import type { Config } from "tailwindcss";
 
-  parchment: "#f5f5f7",
-
-  ink: {
-    950: "#1d1d1f",
-    900: "#2d2d2f",
-    800: "#424245",
-    700: "#6e6e73",
-    600: "#86868b",
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0066cc",
+        "primary-focus": "#0071e3",
+        "primary-on-dark": "#2997ff",
+        ink: "#1d1d1f",
+        body: "#1d1d1f",
+        "body-on-dark": "#ffffff",
+        canvas: "#ffffff",
+        "canvas-parchment": "#f5f5f7",
+        "surface-pearl": "#fafafc",
+        "surface-tile-1": "#272729",
+        "surface-tile-2": "#2a2a2c",
+        "surface-tile-3": "#252527",
+        "surface-black": "#000000",
+        hairline: "#e0e0e0",
+      },
+      borderRadius: {
+        pill: "9999px",
+      },
+      boxShadow: {
+        product: "3px 5px 30px 0px rgba(0, 0, 0, 0.22)",
+      },
+    },
   },
-
-  paper: {
-    100: "#1d1d1f",
-    300: "#424245",
-    500: "#86868b",
-  },
-
-  primary: {
-    400: "#0071e3",
-    500: "#0066cc",
-    600: "#0055aa",
-  },
-
-  success: {
-    400: "#34c759",
-    500: "#28a745",
-  },
-
-  danger: {
-    400: "#ff453a",
-    500: "#d70015",
-  },
-},
+  plugins: [],
+};
+export default config;
