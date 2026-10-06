@@ -106,29 +106,29 @@ export default function EntryEditModal({
   return (
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/60 sm:items-center">
       <div className="w-full max-w-sm rounded-t-card border border-ink-700 bg-ink-800 p-5 sm:rounded-card">
-        <h2 className="mb-4 text-base font-semibold text-paper-100">
+        <h2 className="mb-4 text-base font-semibold text-[#1d1d1f]">
           {entry ? "Edytuj wpis" : "Dodaj wpis ręcznie"}
         </h2>
 
         <div className="space-y-3">
           <div className="min-w-0 overflow-x-auto">
-            <label className="mb-1 block text-xs text-paper-500">Data</label>
+            <label className="mb-1 block text-xs text-[#86868b]">Data</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0">
-              <label className="mb-1 block text-xs text-paper-500">Początek</label>
+              <label className="mb-1 block text-xs text-[#86868b]">Początek</label>
               <TimeSelect value={startTime} onChange={setStartTime} />
             </div>
             <div className="min-w-0">
               <div className="mb-1 flex items-center justify-between">
-                <label className="block text-xs text-paper-500">Koniec</label>
-                <label className="flex items-center gap-1.5 text-xs text-paper-500">
+                <label className="block text-xs text-[#86868b]">Koniec</label>
+                <label className="flex items-center gap-1.5 text-xs text-[#86868b]">
                   <input
                     type="checkbox"
                     checked={stillRunning}
@@ -142,7 +142,7 @@ export default function EntryEditModal({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500">Lokalizacja</label>
+            <label className="mb-1 block text-xs text-[#86868b]">Lokalizacja</label>
             <div className="grid grid-cols-2 gap-2">
               {LOCATION_OPTIONS.map((opt) => (
                 <button
@@ -151,7 +151,7 @@ export default function EntryEditModal({
                   className={`rounded-card border px-3 py-1.5 text-sm ${
                     label === opt
                       ? "border-amber-500 bg-amber-500/10 text-amber-400"
-                      : "border-ink-700 text-paper-500"
+                      : "border-ink-700 text-[#86868b]"
                   }`}
                 >
                   {opt}
@@ -160,12 +160,12 @@ export default function EntryEditModal({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500">Notatka (opcjonalnie)</label>
+            <label className="mb-1 block text-xs text-[#86868b]">Notatka (opcjonalnie)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
               placeholder="np. targi Poznan"
             />
           </div>

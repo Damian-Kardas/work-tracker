@@ -96,33 +96,33 @@ export default function LeaveEntryForm({
   return (
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/60 sm:items-center">
       <div className="w-full max-w-sm rounded-t-card border border-ink-700 bg-ink-800 p-5 sm:rounded-card">
-        <h2 className="mb-4 text-base font-semibold text-paper-100">
+        <h2 className="mb-4 text-base font-semibold text-[#1d1d1f]">
           {entry ? "Edytuj urlop" : "Dodaj urlop"}
         </h2>
 
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0 overflow-x-auto">
-              <label className="mb-1 block text-xs text-paper-500">Od</label>
+              <label className="mb-1 block text-xs text-[#86868b]">Od</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDatesChange(e.target.value, endDate)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
               />
             </div>
             <div className="min-w-0 overflow-x-auto">
-              <label className="mb-1 block text-xs text-paper-500">Do</label>
+              <label className="mb-1 block text-xs text-[#86868b]">Do</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDatesChange(startDate, e.target.value)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
               />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500">
+            <label className="mb-1 block text-xs text-[#86868b]">
               Liczba dni (wyliczona z dni roboczych, możesz poprawić)
             </label>
             <input
@@ -131,11 +131,11 @@ export default function LeaveEntryForm({
               step={0.5}
               value={daysCount}
               onChange={(e) => setDaysCount(Number(e.target.value))}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500">Typ</label>
+            <label className="mb-1 block text-xs text-[#86868b]">Typ</label>
             <div className="grid grid-cols-2 gap-2">
               {LEAVE_TYPES.map((t) => (
                 <button
@@ -144,7 +144,7 @@ export default function LeaveEntryForm({
                   className={`rounded-card border px-3 py-1.5 text-sm ${
                     leaveType === t
                       ? "border-amber-500 bg-amber-500/10 text-amber-400"
-                      : "border-ink-700 text-paper-500"
+                      : "border-ink-700 text-[#86868b]"
                   }`}
                 >
                   {LEAVE_TYPE_LABELS[t]}
@@ -153,12 +153,12 @@ export default function LeaveEntryForm({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500">Notatka (opcjonalnie)</label>
+            <label className="mb-1 block text-xs text-[#86868b]">Notatka (opcjonalnie)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
             />
           </div>
         </div>
