@@ -1,10 +1,5 @@
 "use client";
 
 export default function NavBar() {
-  return (
-    <nav>
-      NavBar
-    </nav>
-  );
+  return <div>NavBar</div>;
 }
-``
