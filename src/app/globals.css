@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-primary: #0066cc;
+  --color-ink: #1d1d1f;
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-surface-tile-1: #272729;
+  --color-surface-black: #000000;
+  --color-hairline: #e0e0e0;
+}
+
+body {
+  font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+  color: var(--color-ink);
+  background-color: var(--color-canvas);
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.374px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .display-heading {
+  font-family: "SF Pro Display", system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.28px;
+}
