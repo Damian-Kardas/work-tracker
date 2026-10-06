@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ExportButtons from "@/components/ExportButtons";
 
 import type {
   LeaveEntry,
@@ -320,7 +321,11 @@ export default function StatsPage() {
           value={String(workedDays)}
         />
       </div>
-
+<ExportButtons
+  entries={monthEntries}
+  leaveEntries={leaveEntries}
+  monthName={monthStart.slice(0, 7)}
+/>
       <div className="rounded-card border border-ink-700 bg-ink-800 p-4">
         <h2 className="mb-3 text-sm text-paper-100">
           Rekordy miesiąca
