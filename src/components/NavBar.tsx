@@ -24,36 +24,28 @@ export default function NavBar() {
   }
 
   return (
-    <nav className="sticky top-0 z-10 border-b border-ink-700 bg-ink-900/95 backdrop-blur">
-      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-        <span className="font-mono text-sm font-semibold tracking-tight text-paper-100">
-          Czas pracy
+    <nav className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-4">
+        <span className="text-lg font-semibold text-gray-900">
+          Work Tracker
         </span>
+
         <button
           onClick={signOut}
-          className="text-xs text-paper-500 transition-colors hover:text-brick-400"
+          className="text-sm text-gray-500 transition hover:text-red-500"
         >
           Wyloguj
         </button>
       </div>
-      <div className="mx-auto flex max-w-lg gap-1 px-2 pb-2">
+
+      <div className="mx-auto flex max-w-lg gap-2 px-2 pb-3">
         {links.map((l) => {
           const active = pathname === l.href;
+
           return (
             <Link
               key={l.href}
               href={l.href}
-              className={`min-w-0 flex-1 rounded-card px-2 py-2 text-center text-xs transition-colors ${
+              className={`flex-1 rounded-xl px-2 py-2 text-center text-sm transition ${
                 active
-                  ? "bg-ink-700 text-amber-400"
-                  : "text-paper-500 hover:bg-ink-800 hover:text-paper-100"
-              }`}
-            >
-              {l.label}
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
-  );
-}
+        
