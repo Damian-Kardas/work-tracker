@@ -1,48 +1,35 @@
-import type { Config } from "tailwindcss";
+colors: {
+  canvas: "#ffffff",
 
-const config: Config = {
-  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
-  theme: {
-    extend: {
-      colors: {
-        ink: {
-          950: "#14171B",
-          900: "#1C2126",
-          800: "#262B32",
-          700: "#323942",
-          600: "#454E59",
-        },
-        paper: {
-          100: "#EDEEF0",
-          300: "#C7CBD1",
-          500: "#8B92A0",
-        },
-        amber: {
-          400: "#F0B658",
-          500: "#E8A33D",
-          600: "#C6822A",
-        },
-        moss: {
-          400: "#7BBBA1",
-          500: "#5FA88F",
-          600: "#478E77",
-        },
-        brick: {
-          400: "#D07C6E",
-          500: "#C1594B",
-          600: "#A5453A",
-        },
-      },
-      fontFamily: {
-        mono: ["'IBM Plex Mono'", "ui-monospace", "SFMono-Regular", "monospace"],
-        sans: ["'IBM Plex Sans'", "ui-sans-serif", "system-ui", "sans-serif"],
-      },
-      borderRadius: {
-        card: "10px",
-      },
-    },
+  parchment: "#f5f5f7",
+
+  ink: {
+    950: "#1d1d1f",
+    900: "#2d2d2f",
+    800: "#424245",
+    700: "#6e6e73",
+    600: "#86868b",
   },
-  plugins: [],
-};
 
-export default config;
+  paper: {
+    100: "#1d1d1f",
+    300: "#424245",
+    500: "#86868b",
+  },
+
+  primary: {
+    400: "#0071e3",
+    500: "#0066cc",
+    600: "#0055aa",
+  },
+
+  success: {
+    400: "#34c759",
+    500: "#28a745",
+  },
+
+  danger: {
+    400: "#ff453a",
+    500: "#d70015",
+  },
+},
