@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Profile, PushSubscriptionRow } from "@/types/database";
+import type { Profile, PushSubscriptionRow, TimeEntry } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-// Ile minut tolerancji wokol standardowej godziny startu/konca liczymy jako "pora wyslac".
-// Powinno byc >= czestotliwosci wywolan crona (patrz vercel.json), zeby nic nie przepadlo.
+// Ile minut tolerancji liczymy jako "pora wyslac". Powinno byc >= czestotliwosci
+// wywolan crona (patrz cron-job.org), zeby nic nie przepadlo, ale malo, zeby nie
+// wysylac tego samego powiadomienia wielokrotnie.
 const WINDOW_MINUTES = 15;
 
 function minutesSinceMidnight(hhmmss: string): number {
@@ -57,40 +58,65 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient();
   const { data: profiles } = await supabase.from("profiles").select("*");
+  const now = new Date();
   let sent = 0;
 
   for (const profile of (profiles as Profile[]) ?? []) {
     const { minutes, weekday, dateStr } = nowInTimezone(profile.timezone);
-    if (!profile.work_days.includes(weekday)) continue;
+    const messages: { title: string; body: string }[] = [];
 
-    const startMinutes = minutesSinceMidnight(profile.standard_start_time);
-    const endMinutes = minutesSinceMidnight(profile.standard_end_time);
+    if (profile.work_days.includes(weekday)) {
+      const startMinutes = minutesSinceMidnight(profile.standard_start_time);
+      const endMinutes = minutesSinceMidnight(profile.standard_end_time);
 
-    let message: { title: string; body: string } | null = null;
-
-    if (Math.abs(minutes - startMinutes) <= WINDOW_MINUTES) {
-      const { data: openToday } = await supabase
-        .from("time_entries")
-        .select("id")
-        .eq("user_id", profile.id)
-        .eq("entry_date", dateStr)
-        .limit(1);
-      if (!openToday || openToday.length === 0) {
-        message = { title: "Pora zacząć pracę", body: "Nie zapomnij włączyć rejestracji czasu pracy." };
+      if (profile.reminder_start_enabled && Math.abs(minutes - startMinutes) <= WINDOW_MINUTES) {
+        const { data: todayRows } = await supabase
+          .from("time_entries")
+          .select("id")
+          .eq("user_id", profile.id)
+          .eq("entry_date", dateStr)
+          .limit(1);
+        if (!todayRows || todayRows.length === 0) {
+          messages.push({ title: "Pora zacząć pracę", body: "Nie zapomnij włączyć rejestracji czasu pracy." });
+        }
       }
-    } else if (Math.abs(minutes - endMinutes) <= WINDOW_MINUTES) {
-      const { data: openEntry } = await supabase
-        .from("time_entries")
-        .select("id")
-        .eq("user_id", profile.id)
-        .is("end_time", null)
-        .limit(1);
-      if (openEntry && openEntry.length > 0) {
-        message = { title: "Koniec dnia pracy", body: "Nie zapomnij zakończyć rejestracji czasu pracy." };
+
+      if (profile.reminder_end_enabled && Math.abs(minutes - endMinutes) <= WINDOW_MINUTES) {
+        const { data: openRows } = await supabase
+          .from("time_entries")
+          .select("id")
+          .eq("user_id", profile.id)
+          .is("end_time", null)
+          .limit(1);
+        if (openRows && openRows.length > 0) {
+          messages.push({ title: "Koniec dnia pracy", body: "Nie zapomnij zakończyć rejestracji czasu pracy." });
+        }
       }
     }
 
-    if (!message) continue;
+    if (profile.overtime_cap_enabled) {
+      const { data: openRows } = await supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", profile.id)
+        .is("end_time", null)
+        .limit(1);
+      const openEntry = (openRows?.[0] as TimeEntry | undefined) ?? null;
+
+      if (openEntry) {
+        const capMs = profile.overtime_cap_hours * 3600 * 1000;
+        const crossTime = new Date(openEntry.start_time).getTime() + capMs;
+        const diffMinutes = (now.getTime() - crossTime) / 60000;
+        if (diffMinutes >= 0 && diffMinutes <= WINDOW_MINUTES) {
+          messages.push({
+            title: "Przekroczono limit nadgodzin",
+            body: `Pracujesz dziś już ponad ${profile.overtime_cap_hours}h. Rozważ zakończenie dnia.`,
+          });
+        }
+      }
+    }
+
+    if (messages.length === 0) continue;
 
     const { data: subs } = await supabase
       .from("push_subscriptions")
@@ -98,16 +124,18 @@ export async function GET(request: Request) {
       .eq("user_id", profile.id);
 
     for (const sub of (subs as PushSubscriptionRow[]) ?? []) {
-      try {
-        await webpush.sendNotification(
-          sub.subscription as webpush.PushSubscription,
-          JSON.stringify(message)
-        );
-        sent++;
-      } catch (err: unknown) {
-        const statusCode = (err as { statusCode?: number })?.statusCode;
-        if (statusCode === 404 || statusCode === 410) {
-          await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+      for (const message of messages) {
+        try {
+          await webpush.sendNotification(
+            sub.subscription as webpush.PushSubscription,
+            JSON.stringify(message)
+          );
+          sent++;
+        } catch (err: unknown) {
+          const statusCode = (err as { statusCode?: number })?.statusCode;
+          if (statusCode === 404 || statusCode === 410) {
+            await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          }
         }
       }
     }

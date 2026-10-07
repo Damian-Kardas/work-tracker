@@ -18,6 +18,10 @@ export interface Profile {
   work_days: number[]; // 1 = poniedzialek ... 7 = niedziela
   annual_leave_days: number;
   timezone: string;
+  reminder_start_enabled: boolean;
+  reminder_end_enabled: boolean;
+  overtime_cap_enabled: boolean;
+  overtime_cap_hours: number;
   created_at: string;
 }
 

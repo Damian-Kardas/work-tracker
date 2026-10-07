@@ -46,6 +46,21 @@ select, input, button, textarea {
   transform: scale(0.95);
 }
 
+/* pulsujace pierscienie wokol przycisku "Rozpocznij" gdy stoper jest nieaktywny */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.82);
+    opacity: 0.55;
+  }
+  70%, 100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

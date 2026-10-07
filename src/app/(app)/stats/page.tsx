@@ -3,38 +3,33 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ExportButtons from "@/components/ExportButtons";
+import WeekBarChart from "@/components/WeekBarChart";
+import WorkEnvironmentsCard from "@/components/WorkEnvironmentsCard";
+import MonthSummaryNav from "@/components/MonthSummaryNav";
 
-import type {
-  LeaveEntry,
-  LocationLabel,
-  Profile,
-  TimeEntry,
-} from "@/types/database";
+import type { LeaveEntry, Profile, TimeEntry } from "@/types/database";
 
-import {
-  diffSeconds,
-  formatDuration,
-  todayIsoDate,
-} from "@/lib/utils/time";
+import { diffSeconds, formatDuration, todayIsoDate } from "@/lib/utils/time";
 
 import {
+  buildMonthlySummary,
   calculateAverageDay,
   calculateBalance,
   calculateLongestDay,
   calculateOvertimeSeconds,
   calculateShortestDay,
-  buildMonthlySummary,
-  countWorkedDays,
   countWorkDaysInRange,
+  countWorkedDays,
   endOfIsoWeekStr,
   endOfMonthStr,
   leaveSecondsInRange,
+  locationDaysBreakdown,
   startOfIsoWeekStr,
   startOfMonthStr,
+  weekDailyBreakdown,
 } from "@/lib/utils/stats";
 
 import StatSummaryCard from "@/components/StatSummaryCard";
-import LocationBadge from "@/components/LocationBadge";
 
 export default function StatsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -98,6 +93,7 @@ export default function StatsPage() {
 
   const monthEntries = entries.filter((e) => e.entry_date >= monthStart && e.entry_date <= monthEnd);
   const yearEntries = entries.filter((e) => e.entry_date.startsWith(currentYear));
+  const weekEntries = entries.filter((e) => e.entry_date >= weekStart && e.entry_date <= weekEnd);
 
   function sumSeconds(fromDate: string, toDate: string) {
     return entries
@@ -122,28 +118,27 @@ export default function StatsPage() {
   const longestDay = calculateLongestDay(monthEntries);
   const shortestDay = calculateShortestDay(monthEntries);
   const balance = calculateBalance(monthWorked, monthTarget);
-  const monthlySummary = buildMonthlySummary(entries, dailySeconds);
-
-  const summaryRows = Object.entries(monthlySummary)
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .slice(0, 12);
-
-  const byLocation: Partial<Record<LocationLabel, number>> = {};
-  monthEntries.forEach((entry) => {
-    const seconds = entry.end_time ? diffSeconds(entry.start_time, entry.end_time) : 0;
-    byLocation[entry.location_label] = (byLocation[entry.location_label] ?? 0) + seconds;
-  });
-  const locationRows = Object.entries(byLocation) as [LocationLabel, number][];
+  const monthlySummary = buildMonthlySummary(entries, dailySeconds, profile.work_days);
+  const dayBreakdown = weekDailyBreakdown(weekEntries, weekStart, dailySeconds);
+  const daysByLocation = locationDaysBreakdown(monthEntries);
 
   return (
     <div className="space-y-6">
       <h1 className="display text-[22px] font-semibold text-ink">Statystyki</h1>
 
+      <WeekBarChart
+        days={dayBreakdown}
+        dailyTargetSeconds={dailySeconds}
+        totalSeconds={weekWorkedActual}
+        todayDate={today}
+      />
+
       <StatSummaryCard title="Ten tydzień" worked={weekWorked} target={weekTarget} leaveSeconds={weekLeave} />
       <StatSummaryCard title="Ten miesiąc" worked={monthWorked} target={monthTarget} leaveSeconds={monthLeave} />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <InfoCard title="Nadgodziny miesiąca" value={formatDuration(monthOvertime)} />
+      <WorkEnvironmentsCard daysByLocation={daysByLocation} />
+
+      <div className="grid gap-3 sm:grid-cols-2">
         <InfoCard title="Nadgodziny roku" value={formatDuration(yearOvertime)} />
         <InfoCard
           title="Bilans miesiąca"
@@ -175,43 +170,9 @@ export default function StatsPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-hairline bg-canvas p-5">
-        <h2 className="mb-3 text-[15px] text-ink">Historia miesięczna</h2>
-        <div>
-          {summaryRows.map(([month, summary]) => (
-            <div
-              key={month}
-              className="flex items-center justify-between border-b border-hairline py-2.5 last:border-b-0"
-            >
-              <div>
-                <p className="text-[14px] text-ink">{month}</p>
-                <p className="text-[12px] text-ink-muted-48">{summary.workedDays} dni pracy</p>
-              </div>
-              <div className="text-right">
-                <p className="tabular-nums text-[14px] text-ink">{formatDuration(summary.worked)}</p>
-                <p className="text-[12px] text-primary">+{formatDuration(summary.overtime)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-hairline bg-canvas p-5">
-        <h2 className="mb-3 text-[15px] text-ink">Lokalizacje (miesiąc)</h2>
-        {locationRows.length === 0 ? (
-          <p className="text-[14px] text-ink-muted-48">Brak danych.</p>
-        ) : (
-          <ul className="space-y-2.5">
-            {locationRows.map(([label, seconds]) => (
-              <li key={label} className="flex items-center justify-between">
-                <LocationBadge label={label} />
-                <span className="tabular-nums text-[14px] text-ink-muted-80">
-                  {formatDuration(seconds)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div>
+        <p className="mb-2 text-[13px] text-ink-muted-48">Historia miesięczna</p>
+        <MonthSummaryNav months={monthlySummary} />
       </div>
     </div>
   );

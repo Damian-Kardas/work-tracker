@@ -205,9 +205,86 @@ export function calculateBalance(
   return workedSeconds - targetSeconds;
 }
 
+/** Rozbicie dnia na godziny standardowe i nadgodziny - do wykresu slupkowego tygodnia. */
+export interface DayBreakdown {
+  date: string;
+  weekday: number; // 1..7
+  worked: number;
+  standard: number;
+  overtime: number;
+}
+
+export function weekDailyBreakdown(
+  entries: TimeEntry[],
+  weekStart: string,
+  dailyTargetSeconds: number
+): DayBreakdown[] {
+  const days = groupEntriesByDay(entries);
+  const result: DayBreakdown[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const date = addDaysIso(weekStart, i);
+    const worked = days.get(date) ?? 0;
+    const standard = Math.min(worked, dailyTargetSeconds);
+    const overtime = Math.max(0, worked - dailyTargetSeconds);
+    result.push({ date, weekday: i + 1, worked, standard, overtime });
+  }
+
+  return result;
+}
+
+/** Sumuje czas pracy w danej lokalizacji (do wykresu "miejsca pracy"). */
+export function locationBreakdown(
+  entries: TimeEntry[]
+): Record<string, number> {
+  const result: Record<string, number> = {};
+
+  entries.forEach((entry) => {
+    if (!entry.end_time) return;
+    const seconds = diffSeconds(entry.start_time, entry.end_time);
+    result[entry.location_label] = (result[entry.location_label] ?? 0) + seconds;
+  });
+
+  return result;
+}
+
+/**
+ * Liczy ile DNI przypada na kazda lokalizacje (nie godzin): dla kazdego dnia bierze
+ * lokalizacje, w ktorej przepracowano najwiecej czasu tego dnia.
+ */
+export function locationDaysBreakdown(
+  entries: TimeEntry[]
+): Record<string, number> {
+  // sekundy per (dzien, lokalizacja)
+  const perDay = new Map<string, Map<string, number>>();
+
+  entries.forEach((entry) => {
+    if (!entry.end_time) return;
+    const seconds = diffSeconds(entry.start_time, entry.end_time);
+    if (!perDay.has(entry.entry_date)) perDay.set(entry.entry_date, new Map());
+    const dayMap = perDay.get(entry.entry_date)!;
+    dayMap.set(entry.location_label, (dayMap.get(entry.location_label) ?? 0) + seconds);
+  });
+
+  const result: Record<string, number> = {};
+  perDay.forEach((dayMap) => {
+    let bestLabel = "";
+    let bestSeconds = -1;
+    dayMap.forEach((seconds, label) => {
+      if (seconds > bestSeconds) {
+        bestSeconds = seconds;
+        bestLabel = label;
+      }
+    });
+    if (bestLabel) result[bestLabel] = (result[bestLabel] ?? 0) + 1;
+  });
+  return result;
+}
+
 export function buildMonthlySummary(
   entries: TimeEntry[],
-  dailyTargetSeconds: number
+  dailyTargetSeconds: number,
+  workDays: number[] = [1, 2, 3, 4, 5]
 ) {
   const summary: Record<
     string,
@@ -215,6 +292,7 @@ export function buildMonthlySummary(
       worked: number;
       overtime: number;
       workedDays: number;
+      target: number;
     }
   > = {};
 
@@ -228,6 +306,7 @@ export function buildMonthlySummary(
         worked: 0,
         overtime: 0,
         workedDays: 0,
+        target: dailyTargetSeconds * countWorkDaysInRange(startOfMonthStr(`${month}-01`), endOfMonthStr(`${month}-01`), workDays),
       };
     }
 

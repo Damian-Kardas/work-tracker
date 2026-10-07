@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import StopwatchCard from "@/components/StopwatchCard";
 import LocationBadge from "@/components/LocationBadge";
+import NextLeaveCard from "@/components/NextLeaveCard";
 
 import {
   diffSeconds,
@@ -20,7 +21,9 @@ import {
   startOfMonthStr,
 } from "@/lib/utils/stats";
 
-import type { Profile, TimeEntry } from "@/types/database";
+import { nextUpcomingLeave } from "@/lib/utils/leave";
+
+import type { LeaveEntry, Profile, TimeEntry } from "@/types/database";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -68,6 +71,14 @@ export default async function DashboardPage() {
 
   const monthEntries = (monthEntriesData as TimeEntry[]) ?? [];
 
+  const { data: leaveData } = await supabase
+    .from("leave_entries")
+    .select("*")
+    .eq("user_id", user!.id)
+    .gte("end_date", today);
+
+  const nextLeave = nextUpcomingLeave((leaveData as LeaveEntry[]) ?? [], today);
+
   const closedToday = entries.filter((e) => e.end_time);
   const todaySeconds = closedToday.reduce(
     (sum, e) => sum + diffSeconds(e.start_time, e.end_time as string),
@@ -97,8 +108,10 @@ export default async function DashboardPage() {
   const remaining = Math.max(0, monthTarget - monthWorked);
 
   return (
-    <div className="space-y-8">
-      <StopwatchCard openEntry={openEntry} />
+    <div className="space-y-6">
+      <StopwatchCard openEntry={openEntry} dailyTargetSeconds={dailyTarget} />
+
+      {nextLeave && <NextLeaveCard leave={nextLeave} today={today} />}
 
       <div className="grid grid-cols-2 gap-3">
         <MiniCard title="Miesiąc" value={formatDuration(monthWorked)} />
