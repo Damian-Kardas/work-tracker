@@ -7,18 +7,19 @@ export default function WeekBarChart({
   days,
   dailyTargetSeconds,
   totalSeconds,
+  weeklyTargetSeconds,
   todayDate,
 }: {
   days: DayBreakdown[];
   dailyTargetSeconds: number;
   totalSeconds: number;
+  weeklyTargetSeconds: number;
   todayDate: string;
 }) {
   const maxWorked = Math.max(...days.map((d) => d.worked), 0);
   const scale = Math.max(dailyTargetSeconds * 1.35, maxWorked * 1.1, 1);
   const baselinePct = Math.min(100, (dailyTargetSeconds / scale) * 100);
-  const weeklyTarget = dailyTargetSeconds * days.filter((d) => d.weekday <= 5).length;
-  const pace = totalSeconds - weeklyTarget;
+  const diff = totalSeconds - weeklyTargetSeconds;
 
   return (
     <div className="rounded-lg border border-hairline bg-canvas p-5">
@@ -36,11 +37,12 @@ export default function WeekBarChart({
         </span>
         <span
           className={`rounded-pill px-2 py-0.5 text-[12px] font-medium ${
-            pace >= 0 ? "bg-[#e6f4ea] text-[#1e7e34]" : "bg-parchment text-ink-muted-48"
+            diff >= 0 ? "bg-[#e6f4ea] text-[#1e7e34]" : "bg-parchment text-ink-muted-48"
           }`}
         >
-          {pace >= 0 ? "+" : "-"}
-          {formatDuration(Math.abs(pace))} tempo
+          {diff >= 0
+            ? `+${formatDuration(diff)} nadgodzin`
+            : `${formatDuration(Math.abs(diff))} do normy tygodnia`}
         </span>
       </div>
 

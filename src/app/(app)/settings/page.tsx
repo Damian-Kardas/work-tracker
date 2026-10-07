@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/types/database";
 import PushOptIn from "@/components/PushOptIn";
 import TimeSelect from "@/components/TimeSelect";
 import Toggle from "@/components/Toggle";
+import AvatarUploader from "@/components/AvatarUploader";
 
 const WEEKDAYS: { value: number; label: string }[] = [
   { value: 1, label: "Pon" },
@@ -18,6 +20,7 @@ const WEEKDAYS: { value: number; label: string }[] = [
 ];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,12 +76,33 @@ export default function SettingsPage() {
     if (!error) setSaved(true);
   }
 
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   if (loading) return <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>;
   if (!profile) return <p className="text-[14px] text-danger">Nie udało się wczytać profilu.</p>;
 
   return (
     <div className="space-y-6">
-      <h1 className="display text-[22px] font-semibold text-ink">Ustawienia</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="display text-[22px] font-semibold text-ink">Ustawienia</h1>
+        <button onClick={handleSignOut} className="press-scale text-[13px] text-ink-muted-48">
+          Wyloguj
+        </button>
+      </div>
+
+      <div className="rounded-lg border border-hairline bg-canvas p-5">
+        <AvatarUploader
+          userId={profile.id}
+          avatarUrl={profile.avatar_url}
+          initial={(email[0] ?? "?").toUpperCase()}
+          onUploaded={(url) => setProfile({ ...profile, avatar_url: url })}
+        />
+      </div>
 
       <div className="space-y-5 rounded-lg border border-hairline bg-canvas p-5">
         <div>
@@ -134,7 +158,7 @@ export default function SettingsPage() {
           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
             <IconBell />
           </span>
-          <p className="text-[15px] font-medium text-ink">Tempo i przypomnienia</p>
+          <p className="text-[15px] font-medium text-ink">Przypomnienia</p>
         </div>
 
         <ReminderRow
@@ -172,7 +196,7 @@ export default function SettingsPage() {
         <ReminderRow
           icon={<IconWarning />}
           title="Limit nadgodzin"
-          subtitle="Powiadomienie po przekroczeniu"
+          subtitle="Powiadomienie po przekroczeniu dziennego limitu"
           last
         >
           <input

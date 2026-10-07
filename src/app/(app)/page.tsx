@@ -79,8 +79,10 @@ export default async function DashboardPage() {
 
   const nextLeave = nextUpcomingLeave((leaveData as LeaveEntry[]) ?? [], today);
 
+  // Czas juz zamkniety dzisiaj (bez biezacego otwartego wpisu) - licznik na kole
+  // doliczy do tego aktualna sesje, zeby nie zerowac postepu po restarcie.
   const closedToday = entries.filter((e) => e.end_time);
-  const todaySeconds = closedToday.reduce(
+  const todayWorkedBeforeOpenSeconds = closedToday.reduce(
     (sum, e) => sum + diffSeconds(e.start_time, e.end_time as string),
     0
   );
@@ -109,27 +111,31 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <StopwatchCard openEntry={openEntry} dailyTargetSeconds={dailyTarget} />
+      <StopwatchCard
+        openEntry={openEntry}
+        dailyTargetSeconds={dailyTarget}
+        todayWorkedBeforeOpenSeconds={todayWorkedBeforeOpenSeconds}
+      />
 
       {nextLeave && <NextLeaveCard leave={nextLeave} today={today} />}
 
       <div className="grid grid-cols-2 gap-3">
-        <MiniCard title="Miesiąc" value={formatDuration(monthWorked)} />
-        <MiniCard title="Nadgodziny" value={formatDuration(overtime)} />
+        <MiniCard title="Godziny w tym miesiącu" value={formatDuration(monthWorked)} />
+        <MiniCard title="Nadgodziny w miesiącu" value={formatDuration(overtime)} />
         <MiniCard
-          title="Bilans"
+          title="Bilans miesiąca"
           value={`${balance >= 0 ? "+" : "-"} ${formatDuration(Math.abs(balance))}`}
         />
-        <MiniCard title="Średnia" value={formatDuration(averageDay)} />
-        <MiniCard title="Do normy" value={formatDuration(remaining)} />
-        <MiniCard title="Dni pracy" value={String(workedDays)} />
+        <MiniCard title="Średnia dzienna" value={formatDuration(averageDay)} />
+        <MiniCard title="Zostało do normy" value={formatDuration(remaining)} />
+        <MiniCard title="Dni pracy w miesiącu" value={String(workedDays)} />
       </div>
 
       <div className="rounded-lg border border-hairline bg-canvas p-5">
         <div className="mb-3 flex items-baseline justify-between">
           <p className="text-[15px] text-ink">Dzisiaj</p>
           <p className="text-[14px] tabular-nums text-ink-muted-48">
-            {formatDuration(todaySeconds)}
+            {formatDuration(todayWorkedBeforeOpenSeconds)}
             {dailyTarget > 0 && <span> / {formatDuration(dailyTarget)}</span>}
           </p>
         </div>
@@ -160,7 +166,7 @@ export default async function DashboardPage() {
 function MiniCard({ title, value }: { title: string; value: string }) {
   return (
     <div className="rounded-lg border border-hairline bg-canvas p-4">
-      <p className="text-[12px] text-ink-muted-48">{title}</p>
+      <p className="text-[12px] leading-tight text-ink-muted-48">{title}</p>
       <p className="display mt-1.5 text-[19px] font-semibold tabular-nums text-ink">{value}</p>
     </div>
   );

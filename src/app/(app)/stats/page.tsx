@@ -6,6 +6,7 @@ import ExportButtons from "@/components/ExportButtons";
 import WeekBarChart from "@/components/WeekBarChart";
 import WorkEnvironmentsCard from "@/components/WorkEnvironmentsCard";
 import MonthSummaryNav from "@/components/MonthSummaryNav";
+import ActivityCalendar from "@/components/ActivityCalendar";
 
 import type { LeaveEntry, Profile, TimeEntry } from "@/types/database";
 
@@ -130,11 +131,14 @@ export default function StatsPage() {
         days={dayBreakdown}
         dailyTargetSeconds={dailySeconds}
         totalSeconds={weekWorkedActual}
+        weeklyTargetSeconds={weekTarget}
         todayDate={today}
       />
 
       <StatSummaryCard title="Ten tydzień" worked={weekWorked} target={weekTarget} leaveSeconds={weekLeave} />
       <StatSummaryCard title="Ten miesiąc" worked={monthWorked} target={monthTarget} leaveSeconds={monthLeave} />
+
+      <ActivityCalendar entries={entries} leaveEntries={leaveEntries} timezone={profile.timezone} />
 
       <WorkEnvironmentsCard daysByLocation={daysByLocation} />
 

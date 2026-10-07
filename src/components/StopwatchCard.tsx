@@ -24,13 +24,16 @@ function getPosition(): Promise<{ lat: number; lng: number } | null> {
 export default function StopwatchCard({
   openEntry,
   dailyTargetSeconds,
+  todayWorkedBeforeOpenSeconds,
 }: {
   openEntry: TimeEntry | null;
   dailyTargetSeconds: number;
+  /** Ile sekund juz przepracowano dzisiaj w ZAMKNIETYCH wpisach (bez biezacego otwartego). */
+  todayWorkedBeforeOpenSeconds: number;
 }) {
   const router = useRouter();
   const [label, setLabel] = useState<LocationLabel>("Biuro");
-  const [elapsed, setElapsed] = useState(0);
+  const [elapsedThisSession, setElapsedThisSession] = useState(0);
   const [now, setNow] = useState(new Date());
   const [busy, setBusy] = useState(false);
   const [locationWarning, setLocationWarning] = useState<string | null>(null);
@@ -38,9 +41,9 @@ export default function StopwatchCard({
 
   useEffect(() => {
     if (openEntry) {
-      setElapsed(diffSeconds(openEntry.start_time, new Date()));
+      setElapsedThisSession(diffSeconds(openEntry.start_time, new Date()));
       tickRef.current = setInterval(() => {
-        setElapsed(diffSeconds(openEntry.start_time, new Date()));
+        setElapsedThisSession(diffSeconds(openEntry.start_time, new Date()));
         setNow(new Date());
       }, 1000);
       return () => {
@@ -95,17 +98,17 @@ export default function StopwatchCard({
   }
 
   if (openEntry) {
-    const pct = dailyTargetSeconds > 0 ? Math.min(100, (elapsed / dailyTargetSeconds) * 100) : 0;
-    const overtime = dailyTargetSeconds > 0 && elapsed > dailyTargetSeconds;
+    // Licznik na kole pokazuje LACZNY czas dzisiaj (wczesniejsze zamkniete wpisy + biezaca sesja),
+    // nie tylko czas od ostatniego klikniecia "Rozpocznij" - inaczej restart po przypadkowym
+    // zakonczeniu zerowalby widoczny postep dnia.
+    const totalToday = todayWorkedBeforeOpenSeconds + elapsedThisSession;
+    const pct = dailyTargetSeconds > 0 ? Math.min(100, (totalToday / dailyTargetSeconds) * 100) : 0;
+    const overtime = dailyTargetSeconds > 0 && totalToday > dailyTargetSeconds;
     const offset = CIRCUMFERENCE * (1 - pct / 100);
 
     return (
       <div className="flex flex-col items-center pb-2 pt-6">
-        <button
-          onClick={handleStop}
-          disabled={busy}
-          className="press-scale relative flex h-56 w-56 items-center justify-center disabled:opacity-70"
-        >
+        <div className="relative flex h-56 w-56 items-center justify-center">
           <svg width="224" height="224" viewBox="0 0 224 224" className="absolute inset-0 -rotate-90">
             <defs>
               <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -134,20 +137,26 @@ export default function StopwatchCard({
               <span className="text-[13px] tabular-nums">{formatHm(now)}</span>
             </div>
             <span className="display text-[34px] font-bold tabular-nums text-ink">
-              {formatDuration(elapsed, "stopwatch")}
+              {formatDuration(totalToday, "stopwatch")}
             </span>
             <span className={`mt-1 text-[15px] font-semibold ${overtime ? "text-[#1e7e34]" : "text-primary"}`}>
               {Math.round(pct)}%
             </span>
           </div>
+        </div>
+
+        <p className="mt-3 text-[13px] text-ink-muted-48">od {formatHm(new Date(openEntry.start_time))}</p>
+
+        <button
+          onClick={handleStop}
+          disabled={busy}
+          className="press-scale mt-3 rounded-pill border border-hairline bg-parchment px-5 py-2 text-[14px] font-medium text-ink disabled:opacity-60"
+        >
+          {busy ? "Zapisywanie…" : "Zakończ pracę"}
         </button>
 
-        <p className="mt-4 text-[13px] text-ink-muted-48">
-          od {formatHm(new Date(openEntry.start_time))} &middot; {busy ? "Zapisywanie…" : "Dotknij, aby zakończyć"}
-        </p>
-
         {locationWarning && (
-          <p className="mt-2 max-w-[240px] text-center text-[12px] text-ink-muted-48">{locationWarning}</p>
+          <p className="mt-3 max-w-[240px] text-center text-[12px] text-ink-muted-48">{locationWarning}</p>
         )}
       </div>
     );
@@ -179,11 +188,17 @@ export default function StopwatchCard({
         <span className="pulse-ring absolute inset-0 rounded-full border-2 border-primary" />
         <span className="pulse-ring absolute inset-0 rounded-full border-2 border-primary" style={{ animationDelay: "0.8s" }} />
         <span className="z-10 text-[16px] font-semibold">
-          {busy ? "Zapisywanie…" : "Rozpocznij"}
+          {busy ? "Zapisywanie…" : todayWorkedBeforeOpenSeconds > 0 ? "Wznów" : "Rozpocznij"}
         </span>
       </button>
 
-      <p className="mt-5 text-[13px] text-ink-muted-48">{label}</p>
+      {todayWorkedBeforeOpenSeconds > 0 && (
+        <p className="mt-4 text-[13px] text-ink-muted-48">
+          Dzisiaj już: {formatDuration(todayWorkedBeforeOpenSeconds)}
+        </p>
+      )}
+
+      <p className="mt-2 text-[13px] text-ink-muted-48">{label}</p>
 
       {locationWarning && (
         <p className="mt-3 max-w-[240px] text-center text-[12px] text-ink-muted-48">{locationWarning}</p>

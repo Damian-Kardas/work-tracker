@@ -78,7 +78,10 @@ export default function LeavePage() {
               </p>
               <p className="mt-0.5 text-[13px] text-ink-muted-48">{LEAVE_TYPE_LABELS[e.leave_type]}</p>
             </div>
-            <span className="text-[14px] tabular-nums text-ink">{e.days_count} dni</span>
+            <span className="flex items-center gap-2">
+              <span className="text-[14px] tabular-nums text-ink">{e.days_count} dni</span>
+              <IconPencil />
+            </span>
           </button>
         ))}
       </div>
@@ -94,5 +97,14 @@ export default function LeavePage() {
         />
       )}
     </div>
+  );
+}
+
+function IconPencil() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ink-muted-48">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" />
+    </svg>
   );
 }

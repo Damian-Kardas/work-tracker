@@ -1,27 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function NavBar() {
-  const router = useRouter();
   const [initial, setInitial] = useState("?");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       const source = data.user?.email ?? "";
       if (source) setInitial(source[0].toUpperCase());
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", data.user.id)
+          .single();
+        if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
+      }
     });
   }, []);
-
-  async function signOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
 
   return (
     <header className="sticky top-0 z-10 border-b border-hairline bg-canvas/90 backdrop-blur-xl">
@@ -38,13 +39,20 @@ export default function NavBar() {
           </span>
         </div>
 
-        <button
-          onClick={signOut}
-          title="Wyloguj"
-          className="press-scale flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-ink-muted-48 to-ink-muted-80 text-[13px] font-semibold text-white"
-        >
-          {initial}
-        </button>
+        <Link href="/settings" title="Ustawienia i profil" className="press-scale">
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarUrl}
+              alt="Twój awatar"
+              className="h-9 w-9 rounded-full border border-hairline object-cover"
+            />
+          ) : (
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-ink-muted-48 to-ink-muted-80 text-[13px] font-semibold text-white">
+              {initial}
+            </span>
+          )}
+        </Link>
       </div>
     </header>
   );

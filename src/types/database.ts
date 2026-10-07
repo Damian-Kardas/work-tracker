@@ -22,6 +22,7 @@ export interface Profile {
   reminder_end_enabled: boolean;
   overtime_cap_enabled: boolean;
   overtime_cap_hours: number;
+  avatar_url: string | null;
   created_at: string;
 }
 
