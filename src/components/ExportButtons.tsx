@@ -15,39 +15,32 @@ export default function ExportButtons({
 }: ExportButtonsProps) {
   async function handleExcelExport() {
     try {
-      const { exportToExcel } = await import(
-        "@/lib/utils/exportExcel"
-      );
-
-      exportToExcel({
-        entries,
-        leaveEntries,
-        monthName,
-      });
+      const { exportToExcel } = await import("@/lib/utils/exportExcel");
+      exportToExcel({ entries, leaveEntries, monthName });
     } catch (error) {
       console.error(error);
       alert("Nie udało się wygenerować pliku Excel.");
     }
   }
-async function handlePdfExport() {
-  alert("PDF tymczasowo wyłączony.");
-}
-``
+
+  function handlePdfExport() {
+    alert("PDF tymczasowo wyłączony.");
+  }
 
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
         onClick={handlePdfExport}
-        className="rounded-card border border-brick-500 bg-brick-500/10 px-4 py-3 text-sm font-medium text-brick-400 transition-colors hover:bg-brick-500/20"
+        className="press-scale rounded-pill border border-hairline bg-canvas px-4 py-2.5 text-[14px] text-ink-muted-80"
       >
-        📄 Eksport PDF
+        Eksport PDF
       </button>
 
       <button
         onClick={handleExcelExport}
-        className="rounded-card border border-moss-500 bg-moss-500/10 px-4 py-3 text-sm font-medium text-moss-400 transition-colors hover:bg-moss-500/20"
+        className="press-scale rounded-pill bg-primary px-4 py-2.5 text-[14px] font-medium text-white"
       >
-        📊 Eksport Excel
+        Eksport Excel
       </button>
     </div>
   );

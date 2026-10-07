@@ -16,29 +16,24 @@ export default function StatSummaryCard({
   const pct = target > 0 ? Math.min(100, (worked / target) * 100) : 0;
 
   return (
-    <div className="rounded-card border border-ink-700 bg-ink-800 p-4">
-      <p className="mb-3 text-sm text-paper-100">{title}</p>
+    <div className="rounded-lg border border-hairline bg-canvas p-5">
+      <p className="mb-3 text-[14px] text-ink-muted-48">{title}</p>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="font-mono text-2xl font-semibold text-amber-400">
+        <span className="display text-[28px] font-semibold tabular-nums text-ink">
           {formatDuration(worked)}
         </span>
-        <span className="text-xs text-paper-500">cel {formatDuration(target)}</span>
+        <span className="text-[13px] text-ink-muted-48">cel {formatDuration(target)}</span>
       </div>
-      <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-ink-700">
-        <div
-          className={`h-full rounded-full ${overtime ? "bg-moss-500" : "bg-amber-500"}`}
-          style={{ width: `${pct}%` }}
-        />
+      <div className="mb-2 h-1.5 w-full overflow-hidden rounded-pill bg-divider-soft">
+        <div className="h-full rounded-pill bg-primary" style={{ width: `${pct}%` }} />
       </div>
-      <p className={`text-xs ${overtime ? "text-moss-400" : "text-paper-500"}`}>
+      <p className="text-[13px] text-ink-muted-48">
         {overtime
           ? `Nadgodziny: ${formatDuration(Math.abs(remaining))}`
           : `Pozostało: ${formatDuration(remaining)}`}
       </p>
       {leaveSeconds > 0 && (
-        <p className="mt-1 text-xs text-paper-500">
-          w tym urlop: {formatDuration(leaveSeconds)}
-        </p>
+        <p className="mt-1 text-[12px] text-ink-muted-48">w tym urlop: {formatDuration(leaveSeconds)}</p>
       )}
     </div>
   );

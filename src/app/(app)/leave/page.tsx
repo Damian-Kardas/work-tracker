@@ -44,12 +44,12 @@ export default function LeavePage() {
   const used = usedLeaveDays(entries, year);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-paper-100">Urlop {year}</h1>
+        <h1 className="display text-[22px] font-semibold text-ink">Urlop {year}</h1>
         <button
           onClick={() => setShowAdd(true)}
-          className="rounded-card bg-ink-700 px-3 py-1.5 text-sm text-paper-100 hover:bg-ink-600"
+          className="press-scale rounded-pill bg-primary px-4 py-2 text-[14px] font-medium text-white"
         >
           + Dodaj urlop
         </button>
@@ -57,28 +57,28 @@ export default function LeavePage() {
 
       {profile && <LeaveBalanceCard total={profile.annual_leave_days} used={used} />}
 
-      {loading && <p className="text-sm text-paper-500">Wczytywanie...</p>}
+      {loading && <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>}
       {!loading && entries.length === 0 && (
-        <p className="text-sm text-paper-500">
+        <p className="text-[14px] text-ink-muted-48">
           Brak wpisów urlopowych. Dodaj urlop, który już wykorzystałeś w tym roku, żeby saldo się zgadzało.
         </p>
       )}
 
-      <div className="space-y-2">
+      <div className="rounded-lg border border-hairline bg-canvas px-4">
         {entries.map((e) => (
           <button
             key={e.id}
             onClick={() => setModalEntry(e)}
-            className="flex w-full items-center justify-between rounded-card border border-ink-700 bg-ink-800 px-4 py-3 text-left hover:border-ink-600"
+            className="flex w-full items-center justify-between border-b border-hairline py-3 text-left last:border-b-0"
           >
             <div>
-              <p className="text-sm text-paper-100">
+              <p className="text-[15px] text-ink">
                 {formatDate(e.start_date)}
-                {e.end_date !== e.start_date && <> &ndash; {formatDate(e.end_date)}</>}
+                {e.end_date !== e.start_date && <> – {formatDate(e.end_date)}</>}
               </p>
-              <p className="mt-1 text-xs text-paper-500">{LEAVE_TYPE_LABELS[e.leave_type]}</p>
+              <p className="mt-0.5 text-[13px] text-ink-muted-48">{LEAVE_TYPE_LABELS[e.leave_type]}</p>
             </div>
-            <span className="font-mono text-sm text-moss-400">{e.days_count} dni</span>
+            <span className="text-[14px] tabular-nums text-ink">{e.days_count} dni</span>
           </button>
         ))}
       </div>

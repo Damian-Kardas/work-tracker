@@ -104,36 +104,36 @@ export default function EntryEditModal({
   }
 
   return (
-    <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/60 sm:items-center">
-      <div className="w-full max-w-sm rounded-t-card border border-ink-700 bg-ink-800 p-5 sm:rounded-card">
-        <h2 className="mb-4 text-base font-semibold text-[#1d1d1f]">
+    <div className="fixed inset-0 z-20 flex items-end justify-center bg-ink/40 sm:items-center">
+      <div className="w-full max-w-sm rounded-t-lg bg-canvas p-6 sm:rounded-lg">
+        <h2 className="display mb-5 text-[19px] font-semibold text-ink">
           {entry ? "Edytuj wpis" : "Dodaj wpis ręcznie"}
         </h2>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="min-w-0 overflow-x-auto">
-            <label className="mb-1 block text-xs text-[#86868b]">Data</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Data</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+              className="w-full min-w-0 rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
             />
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="min-w-0">
-              <label className="mb-1 block text-xs text-[#86868b]">Początek</label>
+              <label className="mb-1.5 block text-[13px] text-ink-muted-48">Początek</label>
               <TimeSelect value={startTime} onChange={setStartTime} />
             </div>
             <div className="min-w-0">
-              <div className="mb-1 flex items-center justify-between">
-                <label className="block text-xs text-[#86868b]">Koniec</label>
-                <label className="flex items-center gap-1.5 text-xs text-[#86868b]">
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-[13px] text-ink-muted-48">Koniec</label>
+                <label className="flex items-center gap-1.5 text-[12px] text-ink-muted-48">
                   <input
                     type="checkbox"
                     checked={stillRunning}
                     onChange={(e) => setStillRunning(e.target.checked)}
-                    className="accent-amber-500"
+                    className="accent-primary"
                   />
                   nadal trwa
                 </label>
@@ -142,16 +142,16 @@ export default function EntryEditModal({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#86868b]">Lokalizacja</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Lokalizacja</label>
             <div className="grid grid-cols-2 gap-2">
               {LOCATION_OPTIONS.map((opt) => (
                 <button
                   key={opt}
                   onClick={() => setLabel(opt)}
-                  className={`rounded-card border px-3 py-1.5 text-sm ${
+                  className={`press-scale rounded-pill border px-3 py-1.5 text-[14px] ${
                     label === opt
-                      ? "border-amber-500 bg-amber-500/10 text-amber-400"
-                      : "border-ink-700 text-[#86868b]"
+                      ? "border-primary-focus border-2 text-ink"
+                      : "border-hairline text-ink-muted-48"
                   }`}
                 >
                   {opt}
@@ -160,23 +160,23 @@ export default function EntryEditModal({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#86868b]">Notatka (opcjonalnie)</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Notatka (opcjonalnie)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+              className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
               placeholder="np. targi Poznan"
             />
           </div>
         </div>
 
-        {error && <p className="mt-3 text-sm text-brick-400">{error}</p>}
+        {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}
 
-        <div className="mt-5 flex gap-2">
+        <div className="mt-6 flex gap-2">
           <button
             onClick={() => onClose(false)}
-            className="flex-1 rounded-card border border-ink-700 py-2 text-sm text-paper-300"
+            className="press-scale flex-1 rounded-pill border border-hairline py-2.5 text-[14px] text-ink-muted-80"
           >
             Anuluj
           </button>
@@ -184,7 +184,7 @@ export default function EntryEditModal({
             <button
               onClick={handleDelete}
               disabled={busy}
-              className="rounded-card border border-brick-500 px-3 py-2 text-sm text-brick-400"
+              className="press-scale rounded-pill border border-danger px-4 py-2.5 text-[14px] text-danger"
             >
               Usuń
             </button>
@@ -192,7 +192,7 @@ export default function EntryEditModal({
           <button
             onClick={handleSave}
             disabled={busy}
-            className="flex-1 rounded-card bg-amber-500 py-2 text-sm font-medium text-ink-950 disabled:opacity-60"
+            className="press-scale flex-1 rounded-pill bg-primary py-2.5 text-[14px] font-medium text-white disabled:opacity-60"
           >
             {busy ? "Zapisywanie..." : "Zapisz"}
           </button>

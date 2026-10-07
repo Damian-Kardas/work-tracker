@@ -68,39 +68,39 @@ export default function SettingsPage() {
     if (!error) setSaved(true);
   }
 
-  if (loading) return <p className="text-sm text-paper-500">Wczytywanie...</p>;
-  if (!profile) return <p className="text-sm text-brick-400">Nie udało się wczytać profilu.</p>;
+  if (loading) return <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>;
+  if (!profile) return <p className="text-[14px] text-danger">Nie udało się wczytać profilu.</p>;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-paper-100">Ustawienia</h1>
+      <h1 className="display text-[22px] font-semibold text-ink">Ustawienia</h1>
 
-      <div className="space-y-4 rounded-card border border-ink-700 bg-ink-800 p-4">
+      <div className="space-y-5 rounded-lg border border-hairline bg-canvas p-5">
         <div>
-          <label className="mb-1 block text-xs text-paper-500">Email</label>
-          <p className="text-sm text-paper-300">{email}</p>
+          <label className="mb-1.5 block text-[13px] text-ink-muted-48">Email</label>
+          <p className="text-[15px] text-ink-muted-80">{email}</p>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-paper-500">Imię i nazwisko</label>
+          <label className="mb-1.5 block text-[13px] text-ink-muted-48">Imię i nazwisko</label>
           <input
             type="text"
             value={profile.full_name ?? ""}
             onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-            className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+            className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="min-w-0">
-            <label className="mb-1 block text-xs text-paper-500">Standardowy start</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Standardowy start</label>
             <TimeSelect
               value={profile.standard_start_time.slice(0, 5)}
               onChange={(hhmm) => setProfile({ ...profile, standard_start_time: `${hhmm}:00` })}
             />
           </div>
           <div className="min-w-0">
-            <label className="mb-1 block text-xs text-paper-500">Standardowy koniec</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Standardowy koniec</label>
             <TimeSelect
               value={profile.standard_end_time.slice(0, 5)}
               onChange={(hhmm) => setProfile({ ...profile, standard_end_time: `${hhmm}:00` })}
@@ -109,7 +109,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="mb-2 block text-xs text-paper-500">Dni robocze</label>
+          <label className="mb-2 block text-[13px] text-ink-muted-48">Dni robocze</label>
           <div className="flex gap-1.5">
             {WEEKDAYS.map((d) => {
               const active = profile.work_days.includes(d.value);
@@ -117,10 +117,8 @@ export default function SettingsPage() {
                 <button
                   key={d.value}
                   onClick={() => toggleDay(d.value)}
-                  className={`flex-1 rounded-card border py-2 text-xs ${
-                    active
-                      ? "border-amber-500 bg-amber-500/10 text-amber-400"
-                      : "border-ink-700 text-paper-500"
+                  className={`press-scale flex-1 rounded-pill border py-2 text-[12px] ${
+                    active ? "border-primary bg-primary text-white" : "border-hairline text-ink-muted-48"
                   }`}
                 >
                   {d.label}
@@ -131,29 +129,27 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-paper-500">Roczny wymiar urlopu (dni)</label>
+          <label className="mb-1.5 block text-[13px] text-ink-muted-48">Roczny wymiar urlopu (dni)</label>
           <input
             type="number"
             min={0}
             step={1}
             value={profile.annual_leave_days}
-            onChange={(e) =>
-              setProfile({ ...profile, annual_leave_days: Number(e.target.value) })
-            }
-            className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-paper-100 outline-none focus:border-amber-500"
+            onChange={(e) => setProfile({ ...profile, annual_leave_days: Number(e.target.value) })}
+            className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
           />
         </div>
 
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full rounded-card bg-amber-500 py-2.5 text-sm font-medium text-ink-950 hover:bg-amber-400 disabled:opacity-60"
+          className="press-scale w-full rounded-pill bg-primary py-3 text-[15px] font-medium text-white disabled:opacity-60"
         >
-          {saving ? "Zapisywanie..." : saved ? "Zapisano ✓" : "Zapisz ustawienia"}
+          {saving ? "Zapisywanie..." : saved ? "Zapisano" : "Zapisz ustawienia"}
         </button>
       </div>
 
-      <div className="rounded-card border border-ink-700 bg-ink-800 p-4">
+      <div className="rounded-lg border border-hairline bg-canvas p-5">
         <PushOptIn />
       </div>
     </div>

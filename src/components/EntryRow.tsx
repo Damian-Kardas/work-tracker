@@ -8,20 +8,19 @@ export default function EntryRow({ entry, onEdit }: { entry: TimeEntry; onEdit: 
   return (
     <button
       onClick={onEdit}
-      className="flex w-full items-center justify-between rounded-card border border-ink-700 bg-ink-800 px-4 py-3 text-left transition-colors hover:border-ink-600"
+      className="flex w-full items-center justify-between border-b border-hairline py-3 text-left last:border-b-0"
     >
       <div>
-        <p className="font-mono text-sm text-paper-100">
-          {formatHm(new Date(entry.start_time))} -{" "}
-          {entry.end_time ? formatHm(new Date(entry.end_time)) : "w toku"}
+        <p className="text-[15px] text-ink">
+          {formatHm(new Date(entry.start_time))} – {entry.end_time ? formatHm(new Date(entry.end_time)) : "w toku"}
         </p>
         <div className="mt-1 flex items-center gap-2">
           <LocationBadge label={entry.location_label} />
-          {entry.is_edited && <span className="text-xs text-paper-500">edytowano</span>}
+          {entry.is_edited && <span className="text-[11px] text-ink-muted-48">edytowano</span>}
         </div>
       </div>
       {seconds !== null && (
-        <span className="font-mono text-sm text-paper-500">{formatDuration(seconds)}</span>
+        <span className="text-[14px] tabular-nums text-ink-muted-48">{formatDuration(seconds)}</span>
       )}
     </button>
   );

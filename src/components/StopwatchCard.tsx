@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { LocationLabel, TimeEntry } from "@/types/database";
 import { diffSeconds, formatDuration, formatHm } from "@/lib/utils/time";
-import LocationBadge from "./LocationBadge";
 
 const LOCATION_OPTIONS: LocationLabel[] = ["Biuro", "Home office", "Targi / wyjazd", "Inne"];
 
@@ -85,56 +84,70 @@ export default function StopwatchCard({ openEntry }: { openEntry: TimeEntry | nu
     router.refresh();
   }
 
-  if (openEntry) {
-    return (
-      <div className="rounded-[20px] border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <p className="text-xs uppercase tracking-wide text-paper-500">
-          Praca trwa od {formatHm(new Date(openEntry.start_time))}
-        </p>
-        <p className="my-6 text-6xl font-bold text-gray-900 tabular-nums">
-          {formatDuration(elapsed, "stopwatch")}
-        </p>
-        <div className="mb-5 flex justify-center">
-          <LocationBadge label={openEntry.location_label} />
-        </div>
-        <button
-          onClick={handleStop}
-          disabled={busy}
-          className="w-full rounded-card bg-brick-500 py-3 text-base font-medium text-paper-100 transition-colors hover:bg-brick-600 disabled:opacity-60"
-        >
-          {busy ? "Zapisywanie..." : "Zakończ pracę"}
-        </button>
-        {locationWarning && <p className="mt-3 text-xs text-paper-500">{locationWarning}</p>}
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-[20px] border border-gray-200 bg-white p-8 text-center shadow-sm">
-      <p className="mb-4 text-xs uppercase tracking-wide text-paper-500">Gdzie dzisiaj pracujesz?</p>
-      <div className="mb-6 grid grid-cols-2 gap-2">
-        {LOCATION_OPTIONS.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => setLabel(opt)}
-            className={`rounded-card border px-3 py-2 text-sm transition-colors ${
-              label === opt
-                ? "border-blue-500 bg-blue-50 text-blue-600"
-                : "border-ink-700 text-paper-500 hover:border-ink-600"
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-col items-center pb-2 pt-6">
+      {!openEntry && (
+        <div className="mb-8 grid w-full grid-cols-2 gap-2">
+          {LOCATION_OPTIONS.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => setLabel(opt)}
+              className={`press-scale rounded-pill border px-4 py-2.5 text-[14px] transition-colors ${
+                label === opt
+                  ? "border-primary-focus border-2 bg-canvas text-ink"
+                  : "border-hairline bg-canvas text-ink-muted-48"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+
       <button
-        onClick={handleStart}
+        onClick={openEntry ? handleStop : handleStart}
         disabled={busy}
-        className="w-full rounded-xl bg-blue-500 py-4 text-base font-medium text-white transition hover:bg-blue-600 disabled:opacity-60"
+        className={`press-scale shadow-product flex h-56 w-56 flex-col items-center justify-center rounded-full text-center transition-colors disabled:opacity-70 ${
+          openEntry ? "bg-tile-1" : "bg-primary"
+        }`}
       >
-        {busy ? "Zapisywanie..." : "Rozpocznij pracę"}
+        {openEntry ? (
+          <>
+            <span className="text-[12px] text-body-muted">
+              od {formatHm(new Date(openEntry.start_time))}
+            </span>
+            <span className="display mt-1 text-[40px] font-semibold tabular-nums text-white">
+              {formatDuration(elapsed, "stopwatch")}
+            </span>
+            <span className="mt-2 text-[14px] text-white">
+              {busy ? "Zapisywanie…" : "Zakończ pracę"}
+            </span>
+          </>
+        ) : (
+          <>
+            <IconStart />
+            <span className="display mt-2 text-[21px] font-semibold text-white">
+              {busy ? "Zapisywanie…" : "Rozpocznij"}
+            </span>
+            <span className="text-[14px] text-white/80">{label}</span>
+          </>
+        )}
       </button>
-      {locationWarning && <p className="mt-3 text-xs text-paper-500">{locationWarning}</p>}
+
+      {locationWarning && (
+        <p className="mt-4 max-w-[220px] text-center text-[12px] text-ink-muted-48">
+          {locationWarning}
+        </p>
+      )}
     </div>
+  );
+}
+
+function IconStart() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5v5l3.2 1.8" />
+    </svg>
   );
 }

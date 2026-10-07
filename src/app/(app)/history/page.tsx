@@ -35,26 +35,28 @@ export default function HistoryPage() {
   }, {});
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-paper-100">Historia</h1>
+        <h1 className="display text-[22px] font-semibold text-ink">Historia</h1>
         <button
           onClick={() => setShowAdd(true)}
-          className="rounded-card bg-ink-700 px-3 py-1.5 text-sm text-paper-100 hover:bg-ink-600"
+          className="press-scale rounded-pill bg-primary px-4 py-2 text-[14px] font-medium text-white"
         >
           + Dodaj wpis
         </button>
       </div>
 
-      {loading && <p className="text-sm text-paper-500">Wczytywanie...</p>}
+      {loading && <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>}
       {!loading && entries.length === 0 && (
-        <p className="text-sm text-paper-500">Brak wpisów. Kliknij &quot;Dodaj wpis&quot;, żeby uzupełnić historię.</p>
+        <p className="text-[14px] text-ink-muted-48">
+          Brak wpisów. Kliknij &quot;Dodaj wpis&quot;, żeby uzupełnić historię.
+        </p>
       )}
 
       {Object.entries(grouped).map(([date, dayEntries]) => (
         <div key={date}>
-          <p className="mb-2 text-xs uppercase tracking-wide text-paper-500">{formatDate(date)}</p>
-          <div className="space-y-2">
+          <p className="mb-2 text-[13px] text-ink-muted-48">{formatDate(date)}</p>
+          <div className="rounded-lg border border-hairline bg-canvas px-4">
             {dayEntries.map((e) => (
               <EntryRow key={e.id} entry={e} onEdit={() => setModalEntry(e)} />
             ))}

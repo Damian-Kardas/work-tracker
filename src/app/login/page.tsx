@@ -43,16 +43,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ink-900 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-parchment px-4">
       <div className="w-full max-w-sm">
-        <h1 className="mb-1 font-mono text-2xl font-semibold text-paper-100">Czas pracy</h1>
-        <p className="mb-8 text-sm text-paper-500">
+        <h1 className="display mb-1 text-[28px] font-semibold text-ink">Czas pracy</h1>
+        <p className="mb-8 text-[15px] text-ink-muted-48">
           {mode === "signin" ? "Zaloguj się do swojego konta." : "Załóż nowe konto."}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs text-paper-500" htmlFor="email">
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48" htmlFor="email">
               Email
             </label>
             <input
@@ -61,12 +61,12 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-800 px-3 py-2 text-paper-100 outline-none focus:border-amber-500"
+              className="w-full rounded-md border border-hairline bg-canvas px-3 py-2.5 text-[15px] text-ink outline-none focus:border-primary"
               placeholder="ty@firma.pl"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-paper-500" htmlFor="password">
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48" htmlFor="password">
               Hasło
             </label>
             <input
@@ -76,18 +76,18 @@ export default function LoginPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-800 px-3 py-2 text-paper-100 outline-none focus:border-amber-500"
+              className="w-full rounded-md border border-hairline bg-canvas px-3 py-2.5 text-[15px] text-ink outline-none focus:border-primary"
               placeholder="min. 6 znakow"
             />
           </div>
 
-          {error && <p className="text-sm text-brick-400">{error}</p>}
-          {info && <p className="text-sm text-moss-400">{info}</p>}
+          {error && <p className="text-[13px] text-danger">{error}</p>}
+          {info && <p className="text-[13px] text-primary">{info}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-card bg-amber-500 py-2.5 font-medium text-ink-950 transition-colors hover:bg-amber-400 disabled:opacity-60"
+            className="press-scale w-full rounded-pill bg-primary py-3 text-[15px] font-medium text-white disabled:opacity-60"
           >
             {loading ? "Chwileczkę..." : mode === "signin" ? "Zaloguj się" : "Załóż konto"}
           </button>
@@ -99,7 +99,7 @@ export default function LoginPage() {
             setError(null);
             setInfo(null);
           }}
-          className="mt-5 w-full text-center text-sm text-paper-500 hover:text-paper-100"
+          className="mt-5 w-full text-center text-[14px] text-primary"
         >
           {mode === "signin" ? "Nie masz konta? Załóż je" : "Masz już konto? Zaloguj się"}
         </button>

@@ -94,35 +94,35 @@ export default function LeaveEntryForm({
   }
 
   return (
-    <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/60 sm:items-center">
-      <div className="w-full max-w-sm rounded-t-card border border-ink-700 bg-ink-800 p-5 sm:rounded-card">
-        <h2 className="mb-4 text-base font-semibold text-[#1d1d1f]">
+    <div className="fixed inset-0 z-20 flex items-end justify-center bg-ink/40 sm:items-center">
+      <div className="w-full max-w-sm rounded-t-lg bg-canvas p-6 sm:rounded-lg">
+        <h2 className="display mb-5 text-[19px] font-semibold text-ink">
           {entry ? "Edytuj urlop" : "Dodaj urlop"}
         </h2>
 
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="min-w-0 overflow-x-auto">
-              <label className="mb-1 block text-xs text-[#86868b]">Od</label>
+              <label className="mb-1.5 block text-[13px] text-ink-muted-48">Od</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDatesChange(e.target.value, endDate)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
               />
             </div>
             <div className="min-w-0 overflow-x-auto">
-              <label className="mb-1 block text-xs text-[#86868b]">Do</label>
+              <label className="mb-1.5 block text-[13px] text-ink-muted-48">Do</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDatesChange(startDate, e.target.value)}
-                className="w-full min-w-0 rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+                className="w-full min-w-0 rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
               />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#86868b]">
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">
               Liczba dni (wyliczona z dni roboczych, możesz poprawić)
             </label>
             <input
@@ -131,20 +131,20 @@ export default function LeaveEntryForm({
               step={0.5}
               value={daysCount}
               onChange={(e) => setDaysCount(Number(e.target.value))}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+              className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#86868b]">Typ</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Typ</label>
             <div className="grid grid-cols-2 gap-2">
               {LEAVE_TYPES.map((t) => (
                 <button
                   key={t}
                   onClick={() => setLeaveType(t)}
-                  className={`rounded-card border px-3 py-1.5 text-sm ${
+                  className={`press-scale rounded-pill border px-3 py-1.5 text-[14px] ${
                     leaveType === t
-                      ? "border-amber-500 bg-amber-500/10 text-amber-400"
-                      : "border-ink-700 text-[#86868b]"
+                      ? "border-primary-focus border-2 text-ink"
+                      : "border-hairline text-ink-muted-48"
                   }`}
                 >
                   {LEAVE_TYPE_LABELS[t]}
@@ -153,22 +153,22 @@ export default function LeaveEntryForm({
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#86868b]">Notatka (opcjonalnie)</label>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Notatka (opcjonalnie)</label>
             <input
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-card border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-[#1d1d1f] outline-none focus:border-amber-500"
+              className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
             />
           </div>
         </div>
 
-        {error && <p className="mt-3 text-sm text-brick-400">{error}</p>}
+        {error && <p className="mt-3 text-[13px] text-danger">{error}</p>}
 
-        <div className="mt-5 flex gap-2">
+        <div className="mt-6 flex gap-2">
           <button
             onClick={() => onClose(false)}
-            className="flex-1 rounded-card border border-ink-700 py-2 text-sm text-paper-300"
+            className="press-scale flex-1 rounded-pill border border-hairline py-2.5 text-[14px] text-ink-muted-80"
           >
             Anuluj
           </button>
@@ -176,7 +176,7 @@ export default function LeaveEntryForm({
             <button
               onClick={handleDelete}
               disabled={busy}
-              className="rounded-card border border-brick-500 px-3 py-2 text-sm text-brick-400"
+              className="press-scale rounded-pill border border-danger px-4 py-2.5 text-[14px] text-danger"
             >
               Usuń
             </button>
@@ -184,7 +184,7 @@ export default function LeaveEntryForm({
           <button
             onClick={handleSave}
             disabled={busy}
-            className="flex-1 rounded-card bg-amber-500 py-2 text-sm font-medium text-ink-950 disabled:opacity-60"
+            className="press-scale flex-1 rounded-pill bg-primary py-2.5 text-[14px] font-medium text-white disabled:opacity-60"
           >
             {busy ? "Zapisywanie..." : "Zapisz"}
           </button>

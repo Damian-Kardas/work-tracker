@@ -1,29 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary: #0066cc;
-  --color-ink: #1d1d1f;
-  --color-canvas: #f5f5f7;
-  --color-canvas-parchment: #ffffff;
-  --color-surface-tile-1: #272729;
-  --color-surface-black: #000000;
-  --color-hairline: #d2d2d7;
+  color-scheme: light;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #1d1d1f;
   background-color: #f5f5f7;
-  margin: 0;
-  font-size: 15px;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+  font-size: 17px;
   line-height: 1.47;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.374px;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-h1, h2, h3, h4, .display-heading {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  letter-spacing: -0.003em;
+h1, h2, h3, .display {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.374px;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+select, input, button, textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 2px;
+}
+
+/* system-wide micro-interaction: every actionable control shrinks slightly when pressed */
+.press-scale {
+  transition: transform 0.15s ease;
+}
+.press-scale:active {
+  transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
