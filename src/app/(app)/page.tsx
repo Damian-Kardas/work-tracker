@@ -32,51 +32,48 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user!.id)
-    .single();
+  // Runda 1: profil (potrzebny do strefy czasowej) i otwarty wpis - rownolegle.
+  const [{ data: profileData }, { data: openEntryRows }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user!.id).single(),
+    supabase
+      .from("time_entries")
+      .select("*")
+      .eq("user_id", user!.id)
+      .is("end_time", null)
+      .limit(1),
+  ]);
 
   const profile = (profileData as Profile | null) ?? null;
+  const openEntry = (openEntryRows?.[0] as TimeEntry | undefined) ?? null;
 
   const today = todayIsoDate(profile?.timezone ?? "Europe/Warsaw");
   const monthStart = startOfMonthStr(today);
   const monthEnd = endOfMonthStr(today);
 
-  const { data: openEntryRows } = await supabase
-    .from("time_entries")
-    .select("*")
-    .eq("user_id", user!.id)
-    .is("end_time", null)
-    .limit(1);
-
-  const openEntry = (openEntryRows?.[0] as TimeEntry | undefined) ?? null;
-
-  const { data: todayEntries } = await supabase
-    .from("time_entries")
-    .select("*")
-    .eq("user_id", user!.id)
-    .eq("entry_date", today)
-    .order("start_time", { ascending: true });
+  // Runda 2: wszystko, co zalezy od daty - tez rownolegle (jedna runda zamiast trzech).
+  const [{ data: todayEntries }, { data: monthEntriesData }, { data: leaveData }] =
+    await Promise.all([
+      supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("entry_date", today)
+        .order("start_time", { ascending: true }),
+      supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", user!.id)
+        .gte("entry_date", monthStart)
+        .lte("entry_date", monthEnd),
+      supabase
+        .from("leave_entries")
+        .select("*")
+        .eq("user_id", user!.id)
+        .gte("end_date", today),
+    ]);
 
   const entries = (todayEntries as TimeEntry[]) ?? [];
-
-  const { data: monthEntriesData } = await supabase
-    .from("time_entries")
-    .select("*")
-    .eq("user_id", user!.id)
-    .gte("entry_date", monthStart)
-    .lte("entry_date", monthEnd);
-
   const monthEntries = (monthEntriesData as TimeEntry[]) ?? [];
-
-  const { data: leaveData } = await supabase
-    .from("leave_entries")
-    .select("*")
-    .eq("user_id", user!.id)
-    .gte("end_date", today);
-
   const nextLeave = nextUpcomingLeave((leaveData as LeaveEntry[]) ?? [], today);
 
   // Czas juz zamkniety dzisiaj (bez biezacego otwartego wpisu) - licznik na kole

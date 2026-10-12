@@ -11,7 +11,7 @@ const WEEKS_SHOWN = 18;
 const MONTH_NAMES_SHORT = [
   "Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru",
 ];
-const WEEKDAY_ROW_LABELS = ["Nd", "", "Wt", "", "Czw", "", "Sob"];
+const WEEKDAY_ROW_LABELS = ["Pn", "", "Śr", "", "Pt", "", "Nd"];
 
 export default function ActivityCalendar({
   entries,
@@ -45,9 +45,10 @@ export default function ActivityCalendar({
     return set;
   }, [leaveEntries]);
 
-  // Zbuduj siatke: kolumny = tygodnie, wiersze = Nd..Sob, zakonczona na dzisiejszej niedzieli-koncu tygodnia
-  const todayWeekday = new Date(today + "T00:00:00Z").getUTCDay(); // 0 = niedziela
-  const gridEnd = addDaysIso(today, 6 - todayWeekday); // najblizsza sobota >= dzis
+  // Siatka: kolumny = tygodnie, wiersze = Pn..Nd (tydzien zaczyna sie w poniedzialek),
+  // konczy sie w niedziele biezacego tygodnia.
+  const todayIsoIndex = (new Date(today + "T00:00:00Z").getUTCDay() + 6) % 7; // 0 = poniedzialek
+  const gridEnd = addDaysIso(today, 6 - todayIsoIndex); // najblizsza niedziela >= dzis
   const gridStart = addDaysIso(gridEnd, -(WEEKS_SHOWN * 7 - 1));
 
   const weeks: string[][] = [];
