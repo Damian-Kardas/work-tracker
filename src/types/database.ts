@@ -23,6 +23,9 @@ export interface Profile {
   overtime_cap_enabled: boolean;
   overtime_cap_hours: number;
   avatar_url: string | null;
+  // Pola z migracji 0005 - opcjonalne, bo przed jej uruchomieniem nie istnieja w bazie
+  auto_close_enabled?: boolean;
+  auto_close_time?: string; // "HH:MM:SS"
   created_at: string;
 }
 
@@ -39,6 +42,7 @@ export interface TimeEntry {
   location_label: LocationLabel;
   notes: string | null;
   is_edited: boolean;
+  auto_closed?: boolean; // migracja 0005
   created_at: string;
   updated_at: string;
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 import StopwatchCard from "@/components/StopwatchCard";
@@ -6,6 +7,7 @@ import NextLeaveCard from "@/components/NextLeaveCard";
 
 import {
   diffSeconds,
+  formatDate,
   formatDuration,
   formatHm,
   todayIsoDate,
@@ -22,6 +24,7 @@ import {
 } from "@/lib/utils/stats";
 
 import { nextUpcomingLeave } from "@/lib/utils/leave";
+import { autoCloseStaleEntry } from "@/lib/utils/autoClose";
 
 import type { LeaveEntry, Profile, TimeEntry } from "@/types/database";
 
@@ -44,14 +47,21 @@ export default async function DashboardPage() {
   ]);
 
   const profile = (profileData as Profile | null) ?? null;
-  const openEntry = (openEntryRows?.[0] as TimeEntry | undefined) ?? null;
+  let openEntry = (openEntryRows?.[0] as TimeEntry | undefined) ?? null;
+
+  // Zapomniany wpis (np. z wczoraj) zamykamy automatycznie o godzinie granicznej z Ustawien,
+  // zanim policzymy cokolwiek dalej - dzieki temu licznik nie "leci" przez cala noc.
+  if (openEntry && profile) {
+    const closed = await autoCloseStaleEntry(supabase, profile, openEntry);
+    if (closed) openEntry = null;
+  }
 
   const today = todayIsoDate(profile?.timezone ?? "Europe/Warsaw");
   const monthStart = startOfMonthStr(today);
   const monthEnd = endOfMonthStr(today);
 
   // Runda 2: wszystko, co zalezy od daty - tez rownolegle (jedna runda zamiast trzech).
-  const [{ data: todayEntries }, { data: monthEntriesData }, { data: leaveData }] =
+  const [{ data: todayEntries }, { data: monthEntriesData }, { data: leaveData }, { data: autoClosedRows }] =
     await Promise.all([
       supabase
         .from("time_entries")
@@ -70,11 +80,21 @@ export default async function DashboardPage() {
         .select("*")
         .eq("user_id", user!.id)
         .gte("end_date", today),
+      // Wpisy zamkniete automatycznie i jeszcze niesprawdzone (edycja zdejmuje te flage).
+      // Przed migracja 0005 zapytanie zwroci blad -> data = null -> po prostu brak komunikatu.
+      supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", user!.id)
+        .eq("auto_closed", true)
+        .order("start_time", { ascending: false })
+        .limit(1),
     ]);
 
   const entries = (todayEntries as TimeEntry[]) ?? [];
   const monthEntries = (monthEntriesData as TimeEntry[]) ?? [];
   const nextLeave = nextUpcomingLeave((leaveData as LeaveEntry[]) ?? [], today);
+  const unreviewedAuto = (autoClosedRows?.[0] as TimeEntry | undefined) ?? null;
 
   // Czas juz zamkniety dzisiaj (bez biezacego otwartego wpisu) - licznik na kole
   // doliczy do tego aktualna sesje, zeby nie zerowac postepu po restarcie.
@@ -108,6 +128,25 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {unreviewedAuto && unreviewedAuto.end_time && (
+        <div className="rounded-lg border border-hairline bg-canvas p-4">
+          <p className="text-[14px] font-medium text-ink">
+            Wpis z {formatDate(unreviewedAuto.entry_date)} zakończono automatycznie o{" "}
+            {formatHm(new Date(unreviewedAuto.end_time), profile?.timezone)}
+          </p>
+          <p className="mt-1 text-[13px] text-ink-muted-48">
+            Nie kliknięto „Zakończ”, więc aplikacja zamknęła wpis o godzinie granicznej. Sprawdź
+            i popraw godzinę zakończenia.
+          </p>
+          <Link
+            href="/history"
+            className="press-scale mt-3 inline-block rounded-pill bg-primary px-4 py-2 text-[13px] font-medium text-white"
+          >
+            Popraw w Historii
+          </Link>
+        </div>
+      )}
+
       <StopwatchCard
         openEntry={openEntry}
         dailyTargetSeconds={dailyTarget}

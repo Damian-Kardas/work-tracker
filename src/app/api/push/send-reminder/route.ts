@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, PushSubscriptionRow, TimeEntry } from "@/types/database";
+import { autoCloseStaleEntry } from "@/lib/utils/autoClose";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 // (max jedno powiadomienie danego rodzaju na dzien), wiec czestotliwosc crona nie ma znaczenia.
 const LATE_TOLERANCE_MINUTES = 30;
 
-type Kind = "start" | "end" | "overtime_cap";
+type Kind = "start" | "end" | "overtime_cap" | "auto_close";
 
 function minutesSinceMidnight(hhmmss: string): number {
   const [h, m] = hhmmss.split(":").map(Number);
@@ -79,6 +80,20 @@ export async function GET(request: Request) {
   for (const profile of (profiles as Profile[]) ?? []) {
     const { minutes, weekday, dateStr } = nowInTimezone(profile.timezone);
 
+    // Automatyczne zamkniecie zapomnianych wpisow - niezaleznie od tego, czy sa subskrypcje push.
+    const closedNow: TimeEntry[] = [];
+    {
+      const { data: openAll } = await supabase
+        .from("time_entries")
+        .select("*")
+        .eq("user_id", profile.id)
+        .is("end_time", null);
+      for (const e of (openAll as TimeEntry[]) ?? []) {
+        const closed = await autoCloseStaleEntry(supabase, profile, e);
+        if (closed) closedNow.push(closed);
+      }
+    }
+
     const { data: subsData } = await supabase
       .from("push_subscriptions")
       .select("*")
@@ -91,6 +106,7 @@ export async function GET(request: Request) {
       weekday,
       date: dateStr,
       subscriptions: subs.length,
+      autoClosedEntries: closedNow.length,
       decisions: [] as string[],
     };
     const decisions = info.decisions as string[];
@@ -147,6 +163,14 @@ export async function GET(request: Request) {
       } else {
         decisions.push(`${kind}: wyslano (${delivered})`);
       }
+    }
+
+    if (closedNow.length > 0) {
+      const hhmm = (profile.auto_close_time ?? "23:00").slice(0, 5);
+      await deliver("auto_close", {
+        title: "Wpis zakończony automatycznie",
+        body: `Nie zakończono pracy – zamknięto wpis o ${hhmm}. Sprawdź godzinę w Historii.`,
+      });
     }
 
     // Dzisiejsze wpisy + ewentualny urlop - potrzebne do decyzji

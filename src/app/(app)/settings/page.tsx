@@ -58,20 +58,23 @@ export default function SettingsPage() {
     setSaving(true);
     setSaved(false);
     const supabase = createClient();
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        full_name: profile.full_name,
-        standard_start_time: profile.standard_start_time,
-        standard_end_time: profile.standard_end_time,
-        work_days: profile.work_days,
-        annual_leave_days: profile.annual_leave_days,
-        reminder_start_enabled: profile.reminder_start_enabled,
-        reminder_end_enabled: profile.reminder_end_enabled,
-        overtime_cap_enabled: profile.overtime_cap_enabled,
-        overtime_cap_hours: profile.overtime_cap_hours,
-      })
-      .eq("id", profile.id);
+    const payload: Record<string, unknown> = {
+      full_name: profile.full_name,
+      standard_start_time: profile.standard_start_time,
+      standard_end_time: profile.standard_end_time,
+      work_days: profile.work_days,
+      annual_leave_days: profile.annual_leave_days,
+      reminder_start_enabled: profile.reminder_start_enabled,
+      reminder_end_enabled: profile.reminder_end_enabled,
+      overtime_cap_enabled: profile.overtime_cap_enabled,
+      overtime_cap_hours: profile.overtime_cap_hours,
+    };
+    // pola z migracji 0005 - wysylamy tylko jesli kolumny istnieja w bazie
+    if (profile.auto_close_enabled !== undefined) {
+      payload.auto_close_enabled = profile.auto_close_enabled;
+      payload.auto_close_time = profile.auto_close_time ?? "23:00:00";
+    }
+    const { error } = await supabase.from("profiles").update(payload).eq("id", profile.id);
     setSaving(false);
     if (!error) setSaved(true);
   }
@@ -215,6 +218,27 @@ export default function SettingsPage() {
         </ReminderRow>
       </div>
 
+      {profile.auto_close_enabled !== undefined && (
+        <div className="rounded-lg border border-hairline bg-canvas p-5">
+          <ReminderRow
+            icon={<IconStop />}
+            title="Automatyczne zakończenie"
+            subtitle="Zamknij wpis, jeśli zapomnisz kliknąć „Zakończ”"
+            last
+          >
+            <TimeSelect
+              value={(profile.auto_close_time ?? "23:00:00").slice(0, 5)}
+              onChange={(hhmm) => setProfile({ ...profile, auto_close_time: `${hhmm}:00` })}
+            />
+            <Toggle
+              checked={profile.auto_close_enabled}
+              onChange={(v) => setProfile({ ...profile, auto_close_enabled: v })}
+              label="Automatyczne zakończenie"
+            />
+          </ReminderRow>
+        </div>
+      )}
+
       <button
         onClick={handleSave}
         disabled={saving}
@@ -275,6 +299,14 @@ function IconMoon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 0010.5 10.5z" />
+    </svg>
+  );
+}
+function IconStop() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="8.5" />
+      <rect x="9" y="9" width="6" height="6" rx="1" />
     </svg>
   );
 }

@@ -162,7 +162,12 @@ export default function HistoryPage() {
                       {formatHm(new Date(e.start_time))} – {e.end_time ? formatHm(new Date(e.end_time)) : "w toku"}
                     </span>
                     <span className="flex items-center gap-2 text-[12px] text-ink-muted-48">
-                      {e.is_edited && "edytowano"}
+                      {e.auto_closed && (
+                        <span className="rounded-pill bg-parchment px-2 py-0.5 text-[11px] font-medium text-ink-muted-80">
+                          zamknięto automatycznie
+                        </span>
+                      )}
+                      {!e.auto_closed && e.is_edited && "edytowano"}
                       {e.notes && <IconNote />}
                       <IconPencil />
                     </span>
@@ -177,6 +182,7 @@ export default function HistoryPage() {
       {(modalEntry || showAdd) && (
         <EntryEditModal
           entry={modalEntry}
+          defaultEndTime={profile?.standard_end_time?.slice(0, 5)}
           onClose={(changed) => {
             setModalEntry(null);
             setShowAdd(false);
