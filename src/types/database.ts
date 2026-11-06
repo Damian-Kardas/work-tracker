@@ -1,5 +1,5 @@
 export type LocationLabel = "Biuro" | "Home office" | "Targi / wyjazd" | "Inne";
-export type LeaveType = "Wypoczynkowy" | "Na zadanie" | "Okolicznosciowy" | "Inne";
+export type LeaveType = "Wypoczynkowy" | "Na zadanie" | "Okolicznosciowy" | "Inne" | "Zwolnienie";
 
 // Wartosci LeaveType odpowiadaja dokladnie ograniczeniu CHECK w bazie (bez polskich znakow -
 // zmiana wymagalaby migracji SQL). To sa tylko etykiety do wyswietlania w interfejsie.
@@ -8,6 +8,7 @@ export const LEAVE_TYPE_LABELS: Record<LeaveType, string> = {
   "Na zadanie": "Na żądanie",
   Okolicznosciowy: "Okolicznościowy",
   Inne: "Inne",
+  Zwolnienie: "Zwolnienie lekarskie",
 };
 
 export interface Profile {

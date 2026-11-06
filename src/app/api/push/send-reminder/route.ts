@@ -3,6 +3,7 @@ import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, PushSubscriptionRow, TimeEntry } from "@/types/database";
 import { autoCloseStaleEntry } from "@/lib/utils/autoClose";
+import { getHoliday } from "@/lib/utils/holidays";
 
 export const dynamic = "force-dynamic";
 
@@ -190,8 +191,9 @@ export async function GET(request: Request) {
     const openEntry = (openRows?.[0] as TimeEntry | undefined) ?? null;
     const onLeave = (leaveRows?.length ?? 0) > 0;
     const isWorkDay = profile.work_days.includes(weekday);
+    const holiday = getHoliday(dateStr);
 
-    if (isWorkDay && !onLeave) {
+    if (isWorkDay && !onLeave && !holiday) {
       const startMinutes = minutesSinceMidnight(profile.standard_start_time);
       const endMinutes = minutesSinceMidnight(profile.standard_end_time);
 
@@ -221,7 +223,13 @@ export async function GET(request: Request) {
         });
       }
     } else {
-      decisions.push(onLeave ? "dzis urlop - pomijam przypomnienia" : "dzis nie jest dniem roboczym");
+      decisions.push(
+        holiday
+          ? `dzis swieto (${holiday.name}) - pomijam przypomnienia`
+          : onLeave
+          ? "dzis urlop/zwolnienie - pomijam przypomnienia"
+          : "dzis nie jest dniem roboczym"
+      );
     }
 
     if (profile.overtime_cap_enabled && openEntry) {

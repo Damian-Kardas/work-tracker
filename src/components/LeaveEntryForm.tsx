@@ -4,18 +4,26 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { LeaveEntry, LeaveType } from "@/types/database";
 import { LEAVE_TYPE_LABELS } from "@/types/database";
+import { addDaysIso } from "@/lib/utils/stats";
+import { isHoliday, isoWeekday } from "@/lib/utils/holidays";
 
-const LEAVE_TYPES: LeaveType[] = ["Wypoczynkowy", "Na zadanie", "Okolicznosciowy", "Inne"];
+const LEAVE_TYPES: LeaveType[] = ["Wypoczynkowy", "Zwolnienie", "Na zadanie", "Okolicznosciowy", "Inne"];
 
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** Dzisiejsza data (YYYY-MM-DD) w czasie lokalnym urzadzenia - nie w UTC. */
+function todayLocal(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Dni robocze (pon-pt) w zakresie, z pominieciem swiat ustawowo wolnych. */
 function businessDaysBetween(startStr: string, endStr: string): number {
-  const start = new Date(startStr);
-  const end = new Date(endStr);
   let count = 0;
-  const cur = new Date(start);
-  while (cur <= end) {
-    const day = cur.getDay();
-    if (day !== 0 && day !== 6) count++;
-    cur.setDate(cur.getDate() + 1);
+  let cur = startStr;
+  while (cur <= endStr) {
+    if (isoWeekday(cur) <= 5 && !isHoliday(cur)) count++;
+    cur = addDaysIso(cur, 1);
   }
   return count;
 }
@@ -23,17 +31,24 @@ function businessDaysBetween(startStr: string, endStr: string): number {
 export default function LeaveEntryForm({
   entry,
   onClose,
+  initialDate,
+  initialType,
 }: {
   entry: LeaveEntry | null;
   onClose: (changed: boolean) => void;
+  /** Wstepnie ustawiona data (np. po kliknieciu dnia w kalendarzu). */
+  initialDate?: string;
+  initialType?: LeaveType;
 }) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = initialDate ?? todayLocal();
   const [startDate, setStartDate] = useState(entry?.start_date ?? today);
   const [endDate, setEndDate] = useState(entry?.end_date ?? today);
   const [daysCount, setDaysCount] = useState(
     entry?.days_count ?? businessDaysBetween(today, today)
   );
-  const [leaveType, setLeaveType] = useState<LeaveType>(entry?.leave_type ?? "Wypoczynkowy");
+  const [leaveType, setLeaveType] = useState<LeaveType>(
+    entry?.leave_type ?? initialType ?? "Wypoczynkowy"
+  );
   const [notes, setNotes] = useState(entry?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -85,7 +100,7 @@ export default function LeaveEntryForm({
 
   async function handleDelete() {
     if (!entry) return;
-    if (!confirm("Usunąć ten wpis urlopu?")) return;
+    if (!confirm("Usunąć ten wpis?")) return;
     setBusy(true);
     const supabase = createClient();
     const { error } = await supabase.from("leave_entries").delete().eq("id", entry.id);
@@ -95,12 +110,37 @@ export default function LeaveEntryForm({
 
   return (
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-ink/40 sm:items-center">
-      <div className="w-full max-w-sm rounded-t-lg bg-canvas p-6 sm:rounded-lg">
+      <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-t-lg bg-canvas p-6 sm:rounded-lg">
         <h2 className="display mb-5 text-[19px] font-semibold text-ink">
-          {entry ? "Edytuj urlop" : "Dodaj urlop"}
+          {entry ? "Edytuj nieobecność" : "Dodaj nieobecność"}
         </h2>
 
         <div className="space-y-4">
+          <div>
+            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Typ</label>
+            <div className="grid grid-cols-2 gap-2">
+              {LEAVE_TYPES.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setLeaveType(t)}
+                  className={`press-scale rounded-pill border px-3 py-1.5 text-[14px] ${
+                    leaveType === t
+                      ? "border-2 border-primary-focus text-ink"
+                      : "border-hairline text-ink-muted-48"
+                  }`}
+                >
+                  {LEAVE_TYPE_LABELS[t]}
+                </button>
+              ))}
+            </div>
+            {leaveType === "Zwolnienie" && (
+              <p className="mt-2 text-[12px] leading-snug text-ink-muted-48">
+                Zwolnienie nie zmniejsza puli urlopu. Dni są wliczane do godzin tak jak urlop
+                (płatne), a w kalendarzu mają osobny kolor.
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="min-w-0 overflow-x-auto">
               <label className="mb-1.5 block text-[13px] text-ink-muted-48">Od</label>
@@ -121,9 +161,10 @@ export default function LeaveEntryForm({
               />
             </div>
           </div>
+
           <div>
             <label className="mb-1.5 block text-[13px] text-ink-muted-48">
-              Liczba dni (wyliczona z dni roboczych, możesz poprawić)
+              Liczba dni (dni robocze bez świąt, możesz poprawić)
             </label>
             <input
               type="number"
@@ -134,24 +175,7 @@ export default function LeaveEntryForm({
               className="w-full rounded-md border border-hairline bg-canvas px-3 py-2 text-[15px] text-ink outline-none focus:border-primary"
             />
           </div>
-          <div>
-            <label className="mb-1.5 block text-[13px] text-ink-muted-48">Typ</label>
-            <div className="grid grid-cols-2 gap-2">
-              {LEAVE_TYPES.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setLeaveType(t)}
-                  className={`press-scale rounded-pill border px-3 py-1.5 text-[14px] ${
-                    leaveType === t
-                      ? "border-primary-focus border-2 text-ink"
-                      : "border-hairline text-ink-muted-48"
-                  }`}
-                >
-                  {LEAVE_TYPE_LABELS[t]}
-                </button>
-              ))}
-            </div>
-          </div>
+
           <div>
             <label className="mb-1.5 block text-[13px] text-ink-muted-48">Notatka (opcjonalnie)</label>
             <input

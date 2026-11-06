@@ -1,3 +1,4 @@
+import { isHoliday } from "@/lib/utils/holidays";
 import type { TimeEntry } from "@/types/database";
 import { diffSeconds } from "./time";
 
@@ -42,7 +43,8 @@ export function countWorkDaysInRange(
   let cur = startStr;
 
   while (cur <= endStr) {
-    if (workDays.includes(isoWeekdayFromDateStr(cur))) {
+    // dzien roboczy liczy sie do normy tylko jesli nie jest swietem ustawowo wolnym
+    if (workDays.includes(isoWeekdayFromDateStr(cur)) && !isHoliday(cur)) {
       count++;
     }
 
@@ -50,6 +52,30 @@ export function countWorkDaysInRange(
   }
 
   return count;
+}
+
+/**
+ * Liczba dni skladajaca sie na MIESIECZNA norme czasu pracy wg Kodeksu pracy:
+ * dni robocze bez swiat, pomniejszona o swieta wypadajace w sobote (gdy sobota nie jest
+ * dniem roboczym) - za takie swieto pracodawca musi udzielic innego dnia wolnego
+ * (art. 130 par. 2 KP), wiec norma spada o dzienny wymiar. Niedziele nie obnizaja normy.
+ */
+export function normDaysInRange(
+  startStr: string,
+  endStr: string,
+  workDays: number[]
+): number {
+  let count = countWorkDaysInRange(startStr, endStr, workDays);
+
+  if (!workDays.includes(6)) {
+    let cur = startStr;
+    while (cur <= endStr) {
+      if (isoWeekdayFromDateStr(cur) === 6 && isHoliday(cur)) count--;
+      cur = addDaysIso(cur, 1);
+    }
+  }
+
+  return Math.max(0, count);
 }
 
 export function leaveSecondsInRange(
@@ -70,7 +96,8 @@ export function leaveSecondsInRange(
     let cur = start;
 
     while (cur <= end) {
-      if (workDays.includes(isoWeekdayFromDateStr(cur))) {
+      // swieto jest juz wylaczone z normy, wiec urlop/zwolnienie w tym dniu nie dolicza godzin drugi raz
+      if (workDays.includes(isoWeekdayFromDateStr(cur)) && !isHoliday(cur)) {
         total += dailySeconds;
       }
 
@@ -284,7 +311,8 @@ export function locationDaysBreakdown(
 export function buildMonthlySummary(
   entries: TimeEntry[],
   dailyTargetSeconds: number,
-  workDays: number[] = [1, 2, 3, 4, 5]
+  workDays: number[] = [1, 2, 3, 4, 5],
+  leaveEntries: { start_date: string; end_date: string }[] = []
 ) {
   const summary: Record<
     string,
@@ -293,6 +321,7 @@ export function buildMonthlySummary(
       overtime: number;
       workedDays: number;
       target: number;
+      leave: number; // sekundy "zaliczone" urlopem / zwolnieniem
     }
   > = {};
 
@@ -306,7 +335,16 @@ export function buildMonthlySummary(
         worked: 0,
         overtime: 0,
         workedDays: 0,
-        target: dailyTargetSeconds * countWorkDaysInRange(startOfMonthStr(`${month}-01`), endOfMonthStr(`${month}-01`), workDays),
+        target:
+          dailyTargetSeconds *
+          normDaysInRange(startOfMonthStr(`${month}-01`), endOfMonthStr(`${month}-01`), workDays),
+        leave: leaveSecondsInRange(
+          leaveEntries,
+          startOfMonthStr(`${month}-01`),
+          endOfMonthStr(`${month}-01`),
+          workDays,
+          dailyTargetSeconds
+        ),
       };
     }
 

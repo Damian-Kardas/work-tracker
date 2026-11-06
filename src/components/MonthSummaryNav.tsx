@@ -8,6 +8,7 @@ interface MonthData {
   overtime: number;
   workedDays: number;
   target: number;
+  leave?: number; // sekundy zaliczone urlopem / zwolnieniem
 }
 
 const MONTH_NAMES = [
@@ -31,7 +32,9 @@ export default function MonthSummaryNav({ months }: { months: Record<string, Mon
   const data = months[key];
   const [year, monthNum] = key.split("-").map(Number);
   const label = `${MONTH_NAMES[monthNum - 1]} ${year}`;
-  const completion = data.target > 0 ? Math.min(100, (data.worked / data.target) * 100) : 0;
+  const leave = data.leave ?? 0;
+  const completion =
+    data.target > 0 ? Math.min(100, ((data.worked + leave) / data.target) * 100) : 0;
   const avgDaily = data.workedDays > 0 ? data.worked / data.workedDays : 0;
 
   return (
@@ -82,6 +85,11 @@ export default function MonthSummaryNav({ months }: { months: Record<string, Mon
       <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-pill bg-divider-soft">
         <div className="h-full rounded-pill bg-primary" style={{ width: `${completion}%` }} />
       </div>
+      {leave > 0 && (
+        <p className="mt-2 text-[12px] text-ink-muted-48">
+          w tym urlop i zwolnienia: {formatDuration(leave)}
+        </p>
+      )}
     </div>
   );
 }

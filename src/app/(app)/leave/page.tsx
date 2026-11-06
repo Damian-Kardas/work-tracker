@@ -46,12 +46,12 @@ export default function LeavePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="display text-[22px] font-semibold text-ink">Urlop {year}</h1>
+        <h1 className="display text-[22px] font-semibold text-ink">Urlop i zwolnienia</h1>
         <button
           onClick={() => setShowAdd(true)}
           className="press-scale rounded-pill bg-primary px-4 py-2 text-[14px] font-medium text-white"
         >
-          + Dodaj urlop
+          + Dodaj
         </button>
       </div>
 
@@ -60,7 +60,7 @@ export default function LeavePage() {
       {loading && <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>}
       {!loading && entries.length === 0 && (
         <p className="text-[14px] text-ink-muted-48">
-          Brak wpisów urlopowych. Dodaj urlop, który już wykorzystałeś w tym roku, żeby saldo się zgadzało.
+          Brak wpisów. Dodaj urlop, który już wykorzystałeś w tym roku, żeby saldo się zgadzało, albo zwolnienie lekarskie.
         </p>
       )}
 
@@ -76,7 +76,13 @@ export default function LeavePage() {
                 {formatDate(e.start_date)}
                 {e.end_date !== e.start_date && <> – {formatDate(e.end_date)}</>}
               </p>
-              <p className="mt-0.5 text-[13px] text-ink-muted-48">{LEAVE_TYPE_LABELS[e.leave_type]}</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-[13px] text-ink-muted-48">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: e.leave_type === "Zwolnienie" ? "#ff9f0a" : "#34a853" }}
+                />
+                {LEAVE_TYPE_LABELS[e.leave_type]}
+              </p>
             </div>
             <span className="flex items-center gap-2">
               <span className="text-[14px] tabular-nums text-ink">{e.days_count} dni</span>

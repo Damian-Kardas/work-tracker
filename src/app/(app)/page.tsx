@@ -18,8 +18,9 @@ import {
   calculateBalance,
   calculateOvertimeSeconds,
   countWorkedDays,
-  countWorkDaysInRange,
   endOfMonthStr,
+  leaveSecondsInRange,
+  normDaysInRange,
   startOfMonthStr,
 } from "@/lib/utils/stats";
 
@@ -79,7 +80,7 @@ export default async function DashboardPage() {
         .from("leave_entries")
         .select("*")
         .eq("user_id", user!.id)
-        .gte("end_date", today),
+        .gte("end_date", monthStart),
       // Wpisy zamkniete automatycznie i jeszcze niesprawdzone (edycja zdejmuje te flage).
       // Przed migracja 0005 zapytanie zwroci blad -> data = null -> po prostu brak komunikatu.
       supabase
@@ -116,15 +117,26 @@ export default async function DashboardPage() {
     return sum + diffSeconds(entry.start_time, entry.end_time);
   }, 0);
 
-  const monthTarget =
-    dailyTarget *
-    countWorkDaysInRange(monthStart, monthEnd, profile?.work_days ?? [1, 2, 3, 4, 5]);
+  const workDays = profile?.work_days ?? [1, 2, 3, 4, 5];
+
+  // Norma miesieczna wg Kodeksu pracy: dni robocze bez swiat (i bez swiat w soboty).
+  const monthTarget = dailyTarget * normDaysInRange(monthStart, monthEnd, workDays);
+
+  // Urlop i zwolnienie lekarskie (platne) zaliczaja sie do normy tak jak przepracowane godziny.
+  const monthLeave = leaveSecondsInRange(
+    (leaveData as LeaveEntry[]) ?? [],
+    monthStart,
+    monthEnd,
+    workDays,
+    dailyTarget
+  );
+  const monthCredited = monthWorked + monthLeave;
 
   const overtime = calculateOvertimeSeconds(monthEntries, dailyTarget);
   const averageDay = calculateAverageDay(monthEntries);
   const workedDays = countWorkedDays(monthEntries);
-  const balance = calculateBalance(monthWorked, monthTarget);
-  const remaining = Math.max(0, monthTarget - monthWorked);
+  const balance = calculateBalance(monthCredited, monthTarget);
+  const remaining = Math.max(0, monthTarget - monthCredited);
 
   return (
     <div className="space-y-6">

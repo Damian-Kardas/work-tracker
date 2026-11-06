@@ -7,7 +7,7 @@ const TABS = [
   { href: "/", label: "Dziś", icon: IconClock },
   { href: "/history", label: "Historia", icon: IconList },
   { href: "/stats", label: "Statystyki", icon: IconChart },
-  { href: "/leave", label: "Urlop", icon: IconPalm },
+  { href: "/leave", label: "Wolne", icon: IconPalm },
   { href: "/settings", label: "Ustawienia", icon: IconGear },
 ] as const;
 

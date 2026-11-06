@@ -2,8 +2,9 @@ import type { LeaveEntry } from "@/types/database";
 
 /** Zwraca najblizszy nadchodzacy (lub trwajacy) urlop wzgledem podanej daty "today" (YYYY-MM-DD). */
 export function nextUpcomingLeave(entries: LeaveEntry[], today: string): LeaveEntry | null {
+  // zwolnienie lekarskie nie jest "zaplanowanym urlopem", wiec nie trafia do odliczania
   const upcoming = entries
-    .filter((e) => e.end_date >= today)
+    .filter((e) => e.end_date >= today && e.leave_type !== "Zwolnienie")
     .sort((a, b) => a.start_date.localeCompare(b.start_date));
   return upcoming[0] ?? null;
 }

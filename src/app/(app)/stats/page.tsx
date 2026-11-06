@@ -7,6 +7,7 @@ import WeekBarChart from "@/components/WeekBarChart";
 import WorkEnvironmentsCard from "@/components/WorkEnvironmentsCard";
 import MonthSummaryNav from "@/components/MonthSummaryNav";
 import ActivityCalendar from "@/components/ActivityCalendar";
+import LeaveEntryForm from "@/components/LeaveEntryForm";
 
 import type { LeaveEntry, Profile, TimeEntry } from "@/types/database";
 
@@ -25,6 +26,7 @@ import {
   endOfMonthStr,
   leaveSecondsInRange,
   locationDaysBreakdown,
+  normDaysInRange,
   startOfIsoWeekStr,
   startOfMonthStr,
   weekDailyBreakdown,
@@ -37,6 +39,8 @@ export default function StatsPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [leaveEntries, setLeaveEntries] = useState<LeaveEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [absenceDate, setAbsenceDate] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -75,7 +79,7 @@ export default function StatsPage() {
     }
 
     load();
-  }, []);
+  }, [reloadKey]);
 
   if (loading) return <p className="text-[14px] text-ink-muted-48">Wczytywanie...</p>;
   if (!profile) return <p className="text-[14px] text-danger">Nie udało się wczytać danych.</p>;
@@ -110,7 +114,7 @@ export default function StatsPage() {
   const monthWorkedActual = sumSeconds(monthStart, monthEnd);
   const monthLeave = leaveSecondsInRange(leaveEntries, monthStart, monthEnd, profile.work_days, dailySeconds);
   const monthWorked = monthWorkedActual + monthLeave;
-  const monthTarget = dailySeconds * countWorkDaysInRange(monthStart, monthEnd, profile.work_days);
+  const monthTarget = dailySeconds * normDaysInRange(monthStart, monthEnd, profile.work_days);
 
   const monthOvertime = calculateOvertimeSeconds(monthEntries, dailySeconds);
   const yearOvertime = calculateOvertimeSeconds(yearEntries, dailySeconds);
@@ -119,7 +123,7 @@ export default function StatsPage() {
   const longestDay = calculateLongestDay(monthEntries);
   const shortestDay = calculateShortestDay(monthEntries);
   const balance = calculateBalance(monthWorked, monthTarget);
-  const monthlySummary = buildMonthlySummary(entries, dailySeconds, profile.work_days);
+  const monthlySummary = buildMonthlySummary(entries, dailySeconds, profile.work_days, leaveEntries);
   const dayBreakdown = weekDailyBreakdown(weekEntries, weekStart, dailySeconds);
   const daysByLocation = locationDaysBreakdown(monthEntries);
 
@@ -138,7 +142,12 @@ export default function StatsPage() {
       <StatSummaryCard title="Ten tydzień" worked={weekWorked} target={weekTarget} leaveSeconds={weekLeave} />
       <StatSummaryCard title="Ten miesiąc" worked={monthWorked} target={monthTarget} leaveSeconds={monthLeave} />
 
-      <ActivityCalendar entries={entries} leaveEntries={leaveEntries} timezone={profile.timezone} />
+      <ActivityCalendar
+        entries={entries}
+        leaveEntries={leaveEntries}
+        timezone={profile.timezone}
+        onAddAbsence={setAbsenceDate}
+      />
 
       <WorkEnvironmentsCard daysByLocation={daysByLocation} />
 
@@ -178,6 +187,18 @@ export default function StatsPage() {
         <p className="mb-2 text-[13px] text-ink-muted-48">Historia miesięczna</p>
         <MonthSummaryNav months={monthlySummary} />
       </div>
+
+      {absenceDate && (
+        <LeaveEntryForm
+          entry={null}
+          initialDate={absenceDate}
+          initialType="Zwolnienie"
+          onClose={(changed) => {
+            setAbsenceDate(null);
+            if (changed) setReloadKey((k) => k + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
